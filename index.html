@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Sector Slots</title>
+    </head>
+    <body>
+        <div id="app">
+            <!-- Title -->
+            <header class="game-header">
+                <h1>SECTOR SLOTS</h1>
+            </header>
+
+            <!-- HUD -->
+            <div class="hud">
+                <div class="hud-item">
+                    <span class="hud-label">Balance</span>
+                    <span id="balance-value" class="hud-value">$0.00</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-label">Last Win</span>
+                    <span id="last-win-value" class="hud-value"></span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-label">Denomination</span>
+                    <select id="denomination-select" class="denom-select"></select>
+                </div>
+                <div class="hud-item">
+                    <span id="spins-value" class="hud-value hud-spins">Spins: 0</span>
+                </div>
+            </div>
+
+            <!-- Main game area -->
+            <div class="game-area">
+                <!-- Grid -->
+                <div id="grid-container" class="grid-container"></div>
+
+                <!-- Lever -->
+                <div id="lever" class="lever" role="button" aria-label="Pull lever to spin" tabindex="0">
+                    <div class="lever-track">
+                        <div class="lever-knob"></div>
+                    </div>
+                    <div class="lever-base"></div>
+                </div>
+            </div>
+
+            <!-- Win display overlay -->
+            <div id="win-display" class="win-display hidden">
+                <div id="win-text" class="win-text"></div>
+            </div>
+
+            <!-- Broke message -->
+            <p id="broke-msg" class="broke-msg hidden">Not enough balance to spin!</p>
+
+            <!-- Couch cushion mechanic -->
+            <div class="couch-section">
+                <button id="couch-btn" class="couch-btn hidden">Search Cushions 🪑</button>
+                <div id="couch-progress" class="couch-progress hidden">
+                    <div class="couch-track">
+                        <div class="couch-bar"></div>
+                    </div>
+                    <p class="couch-label">Searching cushions…</p>
+                </div>
+                <p id="couch-found" class="couch-found hidden"></p>
+            </div>
+        </div>
+
+        <script type="module" src="/src/main.ts"></script>
+    </body>
+</html>
