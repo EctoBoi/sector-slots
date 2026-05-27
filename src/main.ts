@@ -129,7 +129,7 @@ function onLeverPull(): void {
             winDisp.show(reward, state.denomination);
             setTimeout(() => {
                 lever.enable();
-            }, 500);
+            }, 350);
         } else {
             winDisp.hide();
             lever.enable();
