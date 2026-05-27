@@ -3,7 +3,6 @@ import { SoundManager } from "../audio/SoundManager";
 
 export class Lever {
     private leverEl: HTMLElement;
-    private knobEl: HTMLElement;
     private trackEl: HTMLElement;
     private isAnimating: boolean = false;
     private onPull: () => void;
@@ -11,7 +10,6 @@ export class Lever {
 
     constructor(leverEl: HTMLElement, onPull: () => void, sound: SoundManager) {
         this.leverEl = leverEl;
-        this.knobEl = leverEl.querySelector(".lever-knob") as HTMLElement;
         this.trackEl = leverEl.querySelector(".lever-track") as HTMLElement;
         this.onPull = onPull;
         this.sound = sound;
