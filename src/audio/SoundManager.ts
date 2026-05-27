@@ -10,9 +10,9 @@ export class SoundManager {
         this.sounds.spin = new Howl({ src: ["/sounds/spin.ogg", "/sounds/spin.mp3"] });
         this.sounds.win_small = new Howl({ src: ["/sounds/win_small.ogg", "/sounds/win_small.mp3"], volume: 0.5 });
         this.sounds.win_medium = new Howl({ src: ["/sounds/win_medium.ogg", "/sounds/win_medium.mp3"] });
-        this.sounds.win_large = new Howl({ src: ["/sounds/win_large.ogg", "/sounds/win_large.mp3"] });
-        this.sounds.win_jackpot = new Howl({ src: ["/sounds/win_jackpot.ogg", "/sounds/win_jackpot.mp3"] });
-        this.sounds.win_mega = new Howl({ src: ["/sounds/win_mega.ogg", "/sounds/win_mega.mp3"] });
+        this.sounds.win_large = new Howl({ src: ["/sounds/win_large.ogg", "/sounds/win_large.mp3"], volume: 1.3 });
+        this.sounds.win_jackpot = new Howl({ src: ["/sounds/win_jackpot.ogg", "/sounds/win_jackpot.mp3"], volume: 1.3 });
+        this.sounds.win_mega = new Howl({ src: ["/sounds/win_mega.ogg", "/sounds/win_mega.mp3"], volume: 1.3 });
         this.sounds.coin = new Howl({ src: ["/sounds/coin.ogg", "/sounds/coin.mp3"] });
         this.sounds.couch = new Howl({ src: ["/sounds/couch.ogg", "/sounds/couch.mp3"] });
         this.sounds.lever = new Howl({ src: ["/sounds/lever.ogg", "/sounds/lever.mp3"] });
