@@ -2,24 +2,35 @@
 // Run: node simulate.mjs [spins]
 
 // ─── Symbols ──────────────────────────────────────────────────────────────────
-const TOP = 0,
-    RIGHT = 1,
-    BOTTOM = 2,
-    LEFT = 3; // BLANK = 4 (no walls)
+// id: 0=TL Corner, 1=TR Corner, 2=BR Corner, 3=BL Corner,
+//     4=V Tunnel, 5=H Tunnel, 6=Blank
+// borders bitmask: T=1, R=2, B=4, L=8
+const BORDERS = [
+    1 | 8, // 0  TL Corner  (T+L)
+    1 | 2, // 1  TR Corner  (T+R)
+    4 | 2, // 2  BR Corner  (B+R)
+    4 | 8, // 3  BL Corner  (B+L)
+    1 | 4, // 4  V Tunnel   (T+B)
+    8 | 2, // 5  H Tunnel   (L+R)
+    0, // 6  Blank
+];
 
 const SYMBOL_WEIGHTS = [
-    0.2325, // 0  Top Line
-    0.2325, // 1  Right Line
-    0.2325, // 2  Bottom Line
-    0.2325, // 3  Left Line
-    0.07, // 4  Blank  — 4×0.2325 + 0.07 = 1.00
+    0.0734, // 0  TL Corner
+    0.0734, // 1  TR Corner
+    0.0733, // 2  BR Corner
+    0.0733, // 3  BL Corner
+    0.0733, // 4  V Tunnel
+    0.0733, // 5  H Tunnel
+    0.56, // 6  Blank  — 2×0.0734 + 4×0.0733 + 0.56 = 1.00
 ];
 
 function weightedRandom(weights) {
-    let r = Math.random();
+    const r = Math.random();
+    let cumulative = 0;
     for (let i = 0; i < weights.length; i++) {
-        r -= weights[i];
-        if (r <= 0) return i;
+        cumulative += weights[i];
+        if (r < cumulative) return i;
     }
     return weights.length - 1;
 }
@@ -30,17 +41,17 @@ function randomizeGrid() {
 
 // ─── Payouts ──────────────────────────────────────────────────────────────────
 const PAYOUT_MULTIPLIERS = {
-    small: 5,
-    medium: 15,
-    large: 50,
-    jackpot: 200,
+    small: 2,
+    medium: 5,
+    large: 20,
+    jackpot: 100,
     mega_jackpot: 1000,
 };
 
 // [minimumCellCount, tier], checked in descending order
 const ENCLOSURE_TIERS = [
-    [19, "mega_jackpot"],
-    [13, "jackpot"],
+    [14, "mega_jackpot"],
+    [10, "jackpot"],
     [7, "large"],
     [3, "medium"],
     [1, "small"],
@@ -57,10 +68,12 @@ const DIRS = [
 function wallBetween(grid, r1, c1, r2, c2) {
     const dr = r2 - r1,
         dc = c2 - c1;
-    if (dr === -1) return grid[r1][c1] === TOP || grid[r2][c2] === BOTTOM;
-    if (dr === 1) return grid[r1][c1] === BOTTOM || grid[r2][c2] === TOP;
-    if (dc === 1) return grid[r1][c1] === RIGHT || grid[r2][c2] === LEFT;
-    if (dc === -1) return grid[r1][c1] === LEFT || grid[r2][c2] === RIGHT;
+    const b1 = BORDERS[grid[r1][c1]],
+        b2 = BORDERS[grid[r2][c2]];
+    if (dr === -1) return !!(b1 & 1) || !!(b2 & 4); // T or neighbor B
+    if (dr === 1) return !!(b1 & 4) || !!(b2 & 1); // B or neighbor T
+    if (dc === 1) return !!(b1 & 2) || !!(b2 & 8); // R or neighbor L
+    if (dc === -1) return !!(b1 & 8) || !!(b2 & 2); // L or neighbor R
     return false;
 }
 
@@ -70,8 +83,8 @@ function floodFillReachable(grid) {
 
     for (let r = 0; r < 5; r++) {
         for (let c = 0; c < 5; c++) {
-            const open =
-                (r === 0 && grid[r][c] !== TOP) || (r === 4 && grid[r][c] !== BOTTOM) || (c === 0 && grid[r][c] !== LEFT) || (c === 4 && grid[r][c] !== RIGHT);
+            const b = BORDERS[grid[r][c]];
+            const open = (r === 0 && !(b & 1)) || (r === 4 && !(b & 4)) || (c === 0 && !(b & 8)) || (c === 4 && !(b & 2));
             if (open && !reached[r][c]) {
                 reached[r][c] = true;
                 queue.push([r, c]);

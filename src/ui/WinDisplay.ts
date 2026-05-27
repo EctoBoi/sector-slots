@@ -40,11 +40,11 @@ export class WinDisplay {
             case "large":
                 return "◆ BIG WIN ◆";
             case "medium":
-                return "◇ WIN";
+                return "◇ WIN ◇";
             case "small":
-                return "· WIN";
+                return "· WIN ·";
             default:
-                return "· WIN";
+                return "· WIN ·";
         }
     }
 }

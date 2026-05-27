@@ -27,31 +27,61 @@ const winTextEl = document.getElementById("win-text")!;
 const couchBtnEl = document.getElementById("couch-btn")!;
 const couchProgressEl = document.getElementById("couch-progress")!;
 const couchFoundEl = document.getElementById("couch-found")!;
-const denomSelect = document.getElementById("denomination-select") as HTMLSelectElement;
+const denomValueEl = document.getElementById("denom-value")!;
+const denomDecBtn = document.getElementById("denom-dec") as HTMLButtonElement;
+const denomIncBtn = document.getElementById("denom-inc") as HTMLButtonElement;
 const brokeMsg = document.getElementById("broke-msg")!;
+const rulesBtn = document.getElementById("rules-btn")!;
+const rulesModal = document.getElementById("rules-modal")!;
+const rulesClose = document.getElementById("rules-close")!;
+const rulesOverlay = rulesModal.querySelector(".rules-overlay")!;
 
-// ─── Populate denomination selector ──────────────────────────────────────────
-DENOMINATIONS.forEach((d) => {
-    const opt = document.createElement("option");
-    opt.value = String(d);
-    opt.textContent = `$${d.toFixed(2)}`;
-    if (d === state.denomination) opt.selected = true;
-    denomSelect.appendChild(opt);
+// ─── Rules modal ──────────────────────────────────────────────────────────────
+rulesBtn.addEventListener("click", () => rulesModal.classList.remove("hidden"));
+rulesClose.addEventListener("click", () => rulesModal.classList.add("hidden"));
+rulesOverlay.addEventListener("click", () => rulesModal.classList.add("hidden"));
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") rulesModal.classList.add("hidden");
 });
 
-denomSelect.addEventListener("change", () => {
-    state.denomination = parseFloat(denomSelect.value);
-    saveState(state);
-    updateUI();
+// ─── Denomination stepper ─────────────────────────────────────────────────────
+let denomIndex = Math.max(0, DENOMINATIONS.indexOf(state.denomination));
+
+function updateDenomUI(): void {
+    denomValueEl.textContent = `$${DENOMINATIONS[denomIndex].toFixed(2)}`;
+    denomDecBtn.disabled = denomIndex === 0;
+    denomIncBtn.disabled = denomIndex === DENOMINATIONS.length - 1;
+}
+
+denomDecBtn.addEventListener("click", () => {
+    if (denomIndex > 0) {
+        denomIndex--;
+        state.denomination = DENOMINATIONS[denomIndex];
+        saveState(state);
+        updateDenomUI();
+        updateUI();
+    }
 });
+
+denomIncBtn.addEventListener("click", () => {
+    if (denomIndex < DENOMINATIONS.length - 1) {
+        denomIndex++;
+        state.denomination = DENOMINATIONS[denomIndex];
+        saveState(state);
+        updateDenomUI();
+        updateUI();
+    }
+});
+
+updateDenomUI();
 
 // ─── Subsystems ───────────────────────────────────────────────────────────────
 const sound = new SoundManager();
 const gridRenderer = new GridRenderer(gridContainer);
 const balanceDisp = new BalanceDisplay(balanceEl, lastWinEl, spinsEl);
 const winDisp = new WinDisplay(winContainerEl, winTextEl);
-const couch = new CouchCushion(couchBtnEl, couchProgressEl, couchFoundEl, onCouchComplete);
-const lever = new Lever(leverEl, onLeverPull);
+const couch = new CouchCushion(couchBtnEl, couchProgressEl, couchFoundEl, onCouchComplete, sound);
+const lever = new Lever(leverEl, onLeverPull, sound);
 
 // ─── Initial render ───────────────────────────────────────────────────────────
 gridRenderer.renderGrid(createEmptyGrid());
@@ -70,7 +100,6 @@ function onLeverPull(): void {
     }
 
     brokeMsg.classList.add("hidden");
-    winDisp.hide();
     gridRenderer.clearHighlights();
 
     state.balance = Math.round((state.balance - cost) * 100) / 100;
@@ -87,7 +116,7 @@ function onLeverPull(): void {
     gridRenderer.animateSpin(newGrid, () => {
         sound.stop("spin");
         isSpinning = false;
-        lever.enable();
+        setTimeout(() => {}, 300);
 
         const matches = detectAllPatterns(newGrid);
         const reward = calculatePayout(matches, state.denomination);
@@ -98,8 +127,12 @@ function onLeverPull(): void {
             sound.playWinTier(reward.highestTier);
             gridRenderer.highlightMatches(matches);
             winDisp.show(reward, state.denomination);
+            setTimeout(() => {
+                lever.enable();
+            }, 500);
         } else {
-            state.lastWin = 0;
+            winDisp.hide();
+            lever.enable();
         }
 
         saveState(state);
@@ -110,7 +143,6 @@ function onLeverPull(): void {
 function onCouchComplete(amount: number): void {
     state.balance += amount;
     state.lastWin = amount;
-    sound.play("coin");
     saveState(state);
     updateUI();
 }
@@ -119,6 +151,6 @@ function updateUI(): void {
     balanceDisp.update(state.balance, state.lastWin, state.totalSpins);
     const spinCost = state.denomination;
     const roundedBalance = Math.round(state.balance * 100) / 100;
-    couch.setVisible(roundedBalance < spinCost);
+    couch.setVisible(roundedBalance < 0.2);
     brokeMsg.classList.toggle("hidden", roundedBalance >= spinCost);
 }

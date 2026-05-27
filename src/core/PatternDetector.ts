@@ -1,6 +1,7 @@
 ﻿import type { GridData } from "./Grid";
 import { ENCLOSURE_TIERS } from "../constants/patterns";
 import type { PayoutTier } from "../constants/patterns";
+import { SYMBOLS, Side } from "../constants/symbols";
 
 export interface PatternMatch {
     cells: [number, number][];
@@ -8,22 +9,23 @@ export interface PatternMatch {
     area: number;
 }
 
-// Symbol IDs — must match symbols.ts
-const TOP    = 0;
-const RIGHT  = 1;
-const BOTTOM = 2;
-const LEFT   = 3;
+const DIRS: [number, number][] = [
+    [-1, 0],
+    [1, 0],
+    [0, 1],
+    [0, -1],
+];
 
-const DIRS: [number, number][] = [[-1, 0], [1, 0], [0, 1], [0, -1]];
-
-/** Returns true if there is a wall on the shared edge between two adjacent cells. */
+/** Returns true if there is a wall on the shared edge between two adjacent cells (OR model). */
 function wallBetween(grid: GridData, r1: number, c1: number, r2: number, c2: number): boolean {
+    const b1 = SYMBOLS[grid[r1][c1]].borders;
+    const b2 = SYMBOLS[grid[r2][c2]].borders;
     const dr = r2 - r1;
     const dc = c2 - c1;
-    if (dr === -1) return grid[r1][c1] === TOP    || grid[r2][c2] === BOTTOM;
-    if (dr ===  1) return grid[r1][c1] === BOTTOM || grid[r2][c2] === TOP;
-    if (dc ===  1) return grid[r1][c1] === RIGHT  || grid[r2][c2] === LEFT;
-    if (dc === -1) return grid[r1][c1] === LEFT   || grid[r2][c2] === RIGHT;
+    if (dr === -1) return !!(b1 & Side.T) || !!(b2 & Side.B);
+    if (dr === 1) return !!(b1 & Side.B) || !!(b2 & Side.T);
+    if (dc === 1) return !!(b1 & Side.R) || !!(b2 & Side.L);
+    if (dc === -1) return !!(b1 & Side.L) || !!(b2 & Side.R);
     return false;
 }
 
@@ -38,11 +40,8 @@ function floodFillReachable(grid: GridData): boolean[][] {
 
     for (let r = 0; r < 5; r++) {
         for (let c = 0; c < 5; c++) {
-            const openToBoundary =
-                (r === 0 && grid[r][c] !== TOP)    ||
-                (r === 4 && grid[r][c] !== BOTTOM) ||
-                (c === 0 && grid[r][c] !== LEFT)   ||
-                (c === 4 && grid[r][c] !== RIGHT);
+            const b = SYMBOLS[grid[r][c]].borders;
+            const openToBoundary = (r === 0 && !(b & Side.T)) || (r === 4 && !(b & Side.B)) || (c === 0 && !(b & Side.L)) || (c === 4 && !(b & Side.R));
             if (openToBoundary && !reached[r][c]) {
                 reached[r][c] = true;
                 queue.push([r, c]);

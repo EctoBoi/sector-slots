@@ -1,3 +1,5 @@
+import { SoundManager } from "../audio/SoundManager";
+
 const SEARCH_DURATION_MS = 10_000;
 const MIN_FIND = 1.0;
 const MAX_FIND = 5.0;
@@ -10,12 +12,14 @@ export class CouchCushion {
     private onComplete: (amount: number) => void;
     private intervalId: number | null = null;
     private startTime: number = 0;
+    private sound: SoundManager;
 
-    constructor(buttonEl: HTMLElement, progressEl: HTMLElement, foundEl: HTMLElement, onComplete: (amount: number) => void) {
+    constructor(buttonEl: HTMLElement, progressEl: HTMLElement, foundEl: HTMLElement, onComplete: (amount: number) => void, sound: SoundManager) {
         this.buttonEl = buttonEl;
         this.progressEl = progressEl;
         this.foundEl = foundEl;
         this.onComplete = onComplete;
+        this.sound = sound;
 
         this.buttonEl.addEventListener("click", () => this.startSearch());
     }
@@ -23,6 +27,7 @@ export class CouchCushion {
     private startSearch(): void {
         if (this.isSearching) return;
         this.isSearching = true;
+        this.sound.play("couch");
         this.buttonEl.classList.add("hidden");
         this.progressEl.classList.remove("hidden");
         this.foundEl.classList.add("hidden");
@@ -58,10 +63,12 @@ export class CouchCushion {
         this.foundEl.textContent = `Found $${amount.toFixed(2)}!`;
         this.foundEl.classList.remove("hidden");
 
+        this.sound.play("coin");
+
         setTimeout(() => {
             this.foundEl.classList.add("hidden");
             this.onComplete(amount);
-        }, 2000);
+        }, 1000);
     }
 
     setVisible(visible: boolean): void {

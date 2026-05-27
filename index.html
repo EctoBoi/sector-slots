@@ -4,12 +4,28 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Sector Slots</title>
+        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
+        <style>
+            #app {
+                visibility: hidden;
+            }
+            .rules-modal.hidden {
+                display: none !important;
+            }
+        </style>
     </head>
-    <body>
+    <body style="background-color: #0d0d1a">
         <div id="app">
             <!-- Title -->
             <header class="game-header">
-                <h1>SECTOR SLOTS</h1>
+                <h1>
+                    <span class="title-sector">SECTOR</span>
+                    <span class="title-slots">SLOTS</span>
+                </h1>
+                <button id="rules-btn" class="rules-btn" aria-label="How to play">?</button>
             </header>
 
             <!-- HUD -->
@@ -23,25 +39,35 @@
                     <span id="last-win-value" class="hud-value"></span>
                 </div>
                 <div class="hud-item">
-                    <span class="hud-label">Denomination</span>
-                    <select id="denomination-select" class="denom-select"></select>
-                </div>
-                <div class="hud-item">
                     <span id="spins-value" class="hud-value hud-spins">Spins: 0</span>
                 </div>
             </div>
 
             <!-- Main game area -->
-            <div class="game-area">
-                <!-- Grid -->
-                <div id="grid-container" class="grid-container"></div>
+            <div class="machine-frame">
+                <div class="game-area">
+                    <!-- Grid -->
+                    <div id="grid-container" class="grid-container"></div>
+                </div>
+            </div>
+            <!-- /.machine-frame -->
 
-                <!-- Lever -->
+            <!-- Bottom controls: lever + denomination -->
+            <div class="bottom-controls">
+                <div class="denom-wrapper">
+                    <span class="denom-wrapper-label">Denomination</span>
+                    <div class="denom-stepper">
+                        <button id="denom-dec" class="denom-btn" aria-label="Decrease denomination">−</button>
+                        <span id="denom-value" class="denom-display">$1.00</span>
+                        <button id="denom-inc" class="denom-btn" aria-label="Increase denomination">+</button>
+                    </div>
+                </div>
                 <div id="lever" class="lever" role="button" aria-label="Pull lever to spin" tabindex="0">
                     <div class="lever-track">
                         <div class="lever-knob"></div>
                     </div>
                     <div class="lever-base"></div>
+                    <div class="lever-foot"></div>
                 </div>
             </div>
 
@@ -63,6 +89,83 @@
                     <p class="couch-label">Searching cushions…</p>
                 </div>
                 <p id="couch-found" class="couch-found hidden"></p>
+            </div>
+        </div>
+
+        <!-- Rules Modal -->
+        <div id="rules-modal" class="rules-modal hidden" role="dialog" aria-modal="true" aria-labelledby="rules-title">
+            <div class="rules-overlay"></div>
+            <div class="rules-panel">
+                <button id="rules-close" class="rules-close" aria-label="Close rules">&times;</button>
+                <h2 id="rules-title" class="rules-title">HOW TO PLAY</h2>
+
+                <section class="rules-section">
+                    <h3>Objective</h3>
+                    <p>
+                        Each spin fills a 5&times;5 grid with tile pieces. Adjacent tile borders that form completely <strong>enclosed regions</strong> award a
+                        payout based on how many cells are enclosed.
+                    </p>
+                </section>
+
+                <section class="rules-section">
+                    <h3>Tiles</h3>
+                    <p>
+                        Tiles are either blank or display border segments on two sides. When neighbouring tiles' borders connect and surround a contiguous group
+                        of cells, an enclosure is detected and wins are paid.
+                    </p>
+                </section>
+
+                <section class="rules-section">
+                    <h3>Enclosure Tiers &amp; Payouts</h3>
+                    <p>Win multipliers are applied to your current denomination per enclosure:</p>
+                    <table class="rules-table">
+                        <thead>
+                            <tr>
+                                <th>Tier</th>
+                                <th>Min. Cells</th>
+                                <th>Multiplier</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="tier-small">
+                                <td>Small</td>
+                                <td>1</td>
+                                <td>2&times;</td>
+                            </tr>
+                            <tr class="tier-medium">
+                                <td>Medium</td>
+                                <td>3</td>
+                                <td>5&times;</td>
+                            </tr>
+                            <tr class="tier-large">
+                                <td>Large</td>
+                                <td>7</td>
+                                <td>20&times;</td>
+                            </tr>
+                            <tr class="tier-jackpot">
+                                <td>Jackpot</td>
+                                <td>10</td>
+                                <td>100&times;</td>
+                            </tr>
+                            <tr class="tier-mega">
+                                <td>Mega Jackpot</td>
+                                <td>14</td>
+                                <td>1000&times;</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="rules-note">Multiple enclosures per spin each award their own payout.</p>
+                </section>
+
+                <section class="rules-section">
+                    <h3>Couch Cushions</h3>
+                    <p>Running low? Search the couch cushions for spare change, it might get you back on your feet!</p>
+                </section>
+
+                <section class="rules-section rules-rtp">
+                    <span class="rtp-label">Return to Player (RTP)</span>
+                    <span class="rtp-value">98.1%</span>
+                </section>
             </div>
         </div>
 

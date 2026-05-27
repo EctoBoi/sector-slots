@@ -12,21 +12,27 @@ export interface Symbol {
 }
 
 export const SYMBOLS: Symbol[] = [
-    { id: 0, name: "Top Line", borders: Side.T },
-    { id: 1, name: "Right Line", borders: Side.R },
-    { id: 2, name: "Bottom Line", borders: Side.B },
-    { id: 3, name: "Left Line", borders: Side.L },
-    { id: 4, name: "Blank", borders: 0 },
+    { id: 0, name: "TL Corner", borders: Side.T | Side.L },
+    { id: 1, name: "TR Corner", borders: Side.T | Side.R },
+    { id: 2, name: "BR Corner", borders: Side.B | Side.R },
+    { id: 3, name: "BL Corner", borders: Side.B | Side.L },
+    { id: 4, name: "V Tunnel", borders: Side.T | Side.B },
+    { id: 5, name: "H Tunnel", borders: Side.L | Side.R },
+    { id: 6, name: "Blank", borders: 0 },
 ];
 
-// 5 values, must sum to 1.0
-// Blank at 7%: calibrated to ~94-95% RTP via enclosure frequency.
+// 7 values, must sum to 1.0
+// Each corner/tunnel contributes 2 wall segments instead of 1, boosting enclosure frequency.
+// Blank is the engagement knob: lower blank → denser walls → more frequent (smaller) wins.
+// blank=0.56 → ~34% hit rate, ~97% RTP  (with multipliers 2/5/15/60/300)
 export const DEFAULT_SYMBOL_WEIGHTS: number[] = [
-    0.2325, // 0  Top Line
-    0.2325, // 1  Right Line
-    0.2325, // 2  Bottom Line
-    0.2325, // 3  Left Line
-    0.07, // 4  Blank  — 4×0.2325 + 0.07 = 1.00
+    0.0734, // 0  TL Corner
+    0.0734, // 1  TR Corner
+    0.0733, // 2  BR Corner
+    0.0733, // 3  BL Corner
+    0.0733, // 4  V Tunnel
+    0.0733, // 5  H Tunnel
+    0.56, // 6  Blank  — 2×0.0734 + 4×0.0733 + 0.56 = 1.00
 ];
 
 export function weightedRandom(weights: number[]): number {

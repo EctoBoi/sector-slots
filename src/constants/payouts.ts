@@ -9,9 +9,9 @@ export const DEFAULT_DENOMINATION = 1.0; // index 4
 export const SPIN_COST_MULTIPLIER = 1; // spin costs 1× denomination
 
 export const PAYOUT_MULTIPLIERS: Record<PayoutTier, number> = {
-    small: 5,
-    medium: 15,
-    large: 50,
-    jackpot: 200,
+    small: 2,
+    medium: 5,
+    large: 20,
+    jackpot: 100,
     mega_jackpot: 1000,
 };
