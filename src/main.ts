@@ -62,14 +62,28 @@ settingsBtn.addEventListener("click", () => settingsModal.classList.remove("hidd
 settingsClose.addEventListener("click", () => settingsModal.classList.add("hidden"));
 settingsOverlay.addEventListener("click", () => settingsModal.classList.add("hidden"));
 
+// Load persisted sound settings
+const savedSoundEnabled = localStorage.getItem("sectorSlots_soundEnabled");
+const savedVolume = localStorage.getItem("sectorSlots_volume");
+if (savedSoundEnabled !== null) {
+    const enabled = savedSoundEnabled !== "false";
+    soundToggle.checked = enabled;
+    volumeSlider.disabled = !enabled;
+}
+if (savedVolume !== null) {
+    volumeSlider.value = savedVolume;
+}
+
 soundToggle.addEventListener("change", () => {
     const enabled = soundToggle.checked;
     sound.setEnabled(enabled);
     volumeSlider.disabled = !enabled;
+    localStorage.setItem("sectorSlots_soundEnabled", String(enabled));
 });
 
 volumeSlider.addEventListener("input", () => {
     sound.setVolume(parseFloat(volumeSlider.value));
+    localStorage.setItem("sectorSlots_volume", volumeSlider.value);
 });
 
 // ─── Denomination stepper ─────────────────────────────────────────────────────
@@ -105,6 +119,9 @@ updateDenomUI();
 
 // ─── Subsystems ───────────────────────────────────────────────────────────────
 const sound = new SoundManager();
+// Apply persisted settings to the sound engine now that it's initialised
+if (savedVolume !== null) sound.setVolume(parseFloat(savedVolume));
+if (savedSoundEnabled !== null) sound.setEnabled(savedSoundEnabled !== "false");
 const gridRenderer = new GridRenderer(gridContainer);
 const balanceDisp = new BalanceDisplay(balanceEl, lastWinEl, spinsEl, highestBalanceEl);
 const winDisp = new WinDisplay(winContainerEl, winTextEl);
