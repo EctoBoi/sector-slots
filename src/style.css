@@ -371,6 +371,10 @@ body {
     opacity: 0.5;
 }
 
+.hud-history {
+    align-items: flex-start;
+}
+
 .denom-stepper {
     display: flex;
     align-items: center;
@@ -787,10 +791,6 @@ body {
     .hud {
         gap: 10px;
         padding: 6px 10px;
-    }
-
-    .hud-value {
-        font-size: 0.95rem;
     }
 }
 

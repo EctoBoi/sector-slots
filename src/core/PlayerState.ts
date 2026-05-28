@@ -5,6 +5,7 @@ export interface PlayerState {
     totalSpins: number;
     lastWin: number;
     denomination: number;
+    highestBalance: number;
 }
 
 export function loadState(startingBalance: number, defaultDenomination: number): PlayerState {
@@ -17,12 +18,13 @@ export function loadState(startingBalance: number, defaultDenomination: number):
                 totalSpins: typeof parsed.totalSpins === "number" ? parsed.totalSpins : 0,
                 lastWin: typeof parsed.lastWin === "number" ? parsed.lastWin : 0,
                 denomination: typeof parsed.denomination === "number" ? parsed.denomination : defaultDenomination,
+                highestBalance: typeof parsed.highestBalance === "number" ? parsed.highestBalance : startingBalance,
             };
         }
     } catch {
         // corrupt storage — fall through to default
     }
-    return { balance: startingBalance, totalSpins: 0, lastWin: 0, denomination: defaultDenomination };
+    return { balance: startingBalance, totalSpins: 0, lastWin: 0, denomination: defaultDenomination, highestBalance: startingBalance };
 }
 
 export function saveState(state: PlayerState): void {

@@ -22,6 +22,7 @@ const leverEl = document.getElementById("lever")!;
 const balanceEl = document.getElementById("balance-value")!;
 const lastWinEl = document.getElementById("last-win-value")!;
 const spinsEl = document.getElementById("spins-value")!;
+const highestBalanceEl = document.getElementById("highest-balance-value")!;
 const winContainerEl = document.getElementById("win-display")!;
 const winTextEl = document.getElementById("win-text")!;
 const couchBtnEl = document.getElementById("couch-btn")!;
@@ -78,7 +79,7 @@ updateDenomUI();
 // ─── Subsystems ───────────────────────────────────────────────────────────────
 const sound = new SoundManager();
 const gridRenderer = new GridRenderer(gridContainer);
-const balanceDisp = new BalanceDisplay(balanceEl, lastWinEl, spinsEl);
+const balanceDisp = new BalanceDisplay(balanceEl, lastWinEl, spinsEl, highestBalanceEl);
 const winDisp = new WinDisplay(winContainerEl, winTextEl);
 const couch = new CouchCushion(couchBtnEl, couchProgressEl, couchFoundEl, onCouchComplete, sound);
 const lever = new Lever(leverEl, onLeverPull, sound);
@@ -148,7 +149,11 @@ function onCouchComplete(amount: number): void {
 }
 
 function updateUI(): void {
-    balanceDisp.update(state.balance, state.lastWin, state.totalSpins);
+    if (state.balance > state.highestBalance) {
+        state.highestBalance = state.balance;
+        saveState(state);
+    }
+    balanceDisp.update(state.balance, state.lastWin, state.totalSpins, state.highestBalance);
     const spinCost = state.denomination;
     const roundedBalance = Math.round(state.balance * 100) / 100;
     couch.setVisible(roundedBalance < 0.2);
