@@ -9,7 +9,7 @@ export const CONFIG = {
     symbolWeights: DEFAULT_SYMBOL_WEIGHTS,
     payoutMultipliers: PAYOUT_MULTIPLIERS as Record<PayoutTier, number>,
     couchSearch: {
-        durationMs: 10_000,
+        durationMs: 7_000,
         minFind: 1.0,
         maxFind: 5.0,
     },

@@ -36,6 +36,9 @@ const rulesBtn = document.getElementById("rules-btn")!;
 const rulesModal = document.getElementById("rules-modal")!;
 const rulesClose = document.getElementById("rules-close")!;
 const rulesOverlay = rulesModal.querySelector(".rules-overlay")!;
+const statsWonEl = document.getElementById("stats-won")!;
+const statsLostEl = document.getElementById("stats-lost")!;
+const statsNetEl = document.getElementById("stats-net")!;
 
 // ─── Rules modal ──────────────────────────────────────────────────────────────
 rulesBtn.addEventListener("click", () => rulesModal.classList.remove("hidden"));
@@ -105,6 +108,7 @@ function onLeverPull(): void {
 
     state.balance = Math.round((state.balance - cost) * 100) / 100;
     state.totalSpins += 1;
+    state.totalAmountLost = Math.round((state.totalAmountLost + cost) * 100) / 100;
     saveState(state);
     updateUI();
 
@@ -125,6 +129,7 @@ function onLeverPull(): void {
         if (reward.totalPayout > 0) {
             state.balance += reward.totalPayout;
             state.lastWin = reward.totalPayout;
+            state.totalAmountWon = Math.round((state.totalAmountWon + reward.totalPayout) * 100) / 100;
             sound.playWinTier(reward.highestTier);
             gridRenderer.highlightMatches(matches);
             winDisp.show(reward, state.denomination);
@@ -154,6 +159,11 @@ function updateUI(): void {
         saveState(state);
     }
     balanceDisp.update(state.balance, state.lastWin, state.totalSpins, state.highestBalance);
+    const net = Math.round((state.totalAmountWon - state.totalAmountLost) * 100) / 100;
+    statsWonEl.textContent = `$${state.totalAmountWon.toFixed(2)}`;
+    statsLostEl.textContent = `$${state.totalAmountLost.toFixed(2)}`;
+    statsNetEl.textContent = (net >= 0 ? "+" : "") + `$${net.toFixed(2)}`;
+    statsNetEl.className = "stats-value" + (net > 0 ? " stats-positive" : net < 0 ? " stats-negative" : "");
     const spinCost = state.denomination;
     const roundedBalance = Math.round(state.balance * 100) / 100;
     couch.setVisible(roundedBalance < 0.2);

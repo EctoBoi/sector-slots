@@ -1,8 +1,9 @@
 import { SoundManager } from "../audio/SoundManager";
+import { CONFIG } from "../constants/config";
 
-const SEARCH_DURATION_MS = 10_000;
-const MIN_FIND = 1.0;
-const MAX_FIND = 5.0;
+const SEARCH_DURATION_MS = CONFIG.couchSearch.durationMs;
+const MIN_FIND = CONFIG.couchSearch.minFind;
+const MAX_FIND = CONFIG.couchSearch.maxFind;
 
 export class CouchCushion {
     private buttonEl: HTMLElement;
