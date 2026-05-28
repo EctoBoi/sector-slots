@@ -36,6 +36,12 @@ const rulesBtn = document.getElementById("rules-btn")!;
 const rulesModal = document.getElementById("rules-modal")!;
 const rulesClose = document.getElementById("rules-close")!;
 const rulesOverlay = rulesModal.querySelector(".rules-overlay")!;
+const settingsBtn = document.getElementById("settings-btn")!;
+const settingsModal = document.getElementById("settings-modal")!;
+const settingsClose = document.getElementById("settings-close")!;
+const settingsOverlay = settingsModal.querySelector(".settings-overlay")!;
+const soundToggle = document.getElementById("sound-toggle") as HTMLInputElement;
+const volumeSlider = document.getElementById("volume-slider") as HTMLInputElement;
 const statsWonEl = document.getElementById("stats-won")!;
 const statsLostEl = document.getElementById("stats-lost")!;
 const statsNetEl = document.getElementById("stats-net")!;
@@ -45,7 +51,25 @@ rulesBtn.addEventListener("click", () => rulesModal.classList.remove("hidden"));
 rulesClose.addEventListener("click", () => rulesModal.classList.add("hidden"));
 rulesOverlay.addEventListener("click", () => rulesModal.classList.add("hidden"));
 document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") rulesModal.classList.add("hidden");
+    if (e.key === "Escape") {
+        rulesModal.classList.add("hidden");
+        settingsModal.classList.add("hidden");
+    }
+});
+
+// ─── Settings modal ───────────────────────────────────────────────────────────
+settingsBtn.addEventListener("click", () => settingsModal.classList.remove("hidden"));
+settingsClose.addEventListener("click", () => settingsModal.classList.add("hidden"));
+settingsOverlay.addEventListener("click", () => settingsModal.classList.add("hidden"));
+
+soundToggle.addEventListener("change", () => {
+    const enabled = soundToggle.checked;
+    sound.setEnabled(enabled);
+    volumeSlider.disabled = !enabled;
+});
+
+volumeSlider.addEventListener("input", () => {
+    sound.setVolume(parseFloat(volumeSlider.value));
 });
 
 // ─── Denomination stepper ─────────────────────────────────────────────────────

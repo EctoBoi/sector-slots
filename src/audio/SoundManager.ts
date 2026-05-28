@@ -1,4 +1,4 @@
-import { Howl } from "howler";
+import { Howl, Howler } from "howler";
 
 type SoundEvent = "spin" | "win_small" | "win_medium" | "win_large" | "win_jackpot" | "win_mega" | "coin" | "couch" | "lever";
 
@@ -7,6 +7,7 @@ export class SoundManager {
     private enabled: boolean = true;
 
     constructor() {
+        Howler.volume(0.5);
         this.sounds.spin = new Howl({ src: ["/sounds/spin.ogg", "/sounds/spin.mp3"] });
         this.sounds.win_small = new Howl({ src: ["/sounds/win_small.ogg", "/sounds/win_small.mp3"], volume: 0.5 });
         this.sounds.win_medium = new Howl({ src: ["/sounds/win_medium.ogg", "/sounds/win_medium.mp3"] });
@@ -52,5 +53,9 @@ export class SoundManager {
 
     setEnabled(on: boolean): void {
         this.enabled = on;
+    }
+
+    setVolume(vol: number): void {
+        Howler.volume(Math.max(0, Math.min(1, vol)));
     }
 }
