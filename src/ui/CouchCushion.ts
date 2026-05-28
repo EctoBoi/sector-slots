@@ -73,7 +73,9 @@ export class CouchCushion {
 
     setVisible(visible: boolean): void {
         if (visible) {
-            this.buttonEl.classList.remove("hidden");
+            if (!this.isSearching) {
+                this.buttonEl.classList.remove("hidden");
+            }
         } else {
             this.buttonEl.classList.add("hidden");
             this.progressEl.classList.add("hidden");

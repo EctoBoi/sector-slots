@@ -138,6 +138,7 @@ body {
     align-items: center;
     justify-content: center;
     opacity: 0.75;
+    -webkit-tap-highlight-color: transparent;
     transition:
         opacity 0.15s,
         background 0.15s;
@@ -391,6 +392,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .denom-btn:hover:not(:disabled) {
@@ -550,6 +552,7 @@ body {
     cursor: pointer;
     user-select: none;
     outline: none;
+    -webkit-tap-highlight-color: transparent;
     position: relative;
     height: 70px;
     overflow: visible;
@@ -621,6 +624,7 @@ body {
     border: 1px solid var(--accent);
     border-radius: 8px;
     padding: 12px 16px;
+    margin-top: -20px;
     text-align: center;
     animation: fadeIn 0.3s ease;
 }
@@ -660,6 +664,7 @@ body {
 /* ─── Broke message ──────────────────────────────────────────────────────── */
 .broke-msg {
     color: #ff6b6b;
+    margin-top: -16px;
     font-size: 0.85rem;
 }
 
@@ -669,6 +674,7 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 8px;
+    margin-top: -8px;
 }
 
 .couch-btn {
@@ -739,7 +745,7 @@ body {
     }
 
     body {
-        padding: 16px 10px;
+        padding: 10px;
     }
 
     .machine-frame {
@@ -748,6 +754,14 @@ body {
 
     .game-header h1 {
         font-size: 1.6rem;
+    }
+
+    .bottom-controls {
+        margin-top: -10px;
+    }
+
+    .hud {
+        margin-top: -16px;
     }
 }
 
