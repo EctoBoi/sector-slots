@@ -426,7 +426,7 @@ body {
     border: 2px solid var(--accent);
     border-radius: 12px;
     padding: 28px 28px 24px;
-    max-width: 340px;
+    max-width: 400px;
     width: 100%;
     box-shadow:
         0 0 0 4px #0d0d1a,
@@ -949,6 +949,27 @@ body {
 
 .couch-btn:hover {
     opacity: 0.85;
+}
+
+.knock-btn {
+    background: transparent;
+    color: #e05555;
+    border: 1px solid #e05555;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition:
+        background 0.15s,
+        color 0.15s;
+    animation: pulse-red 0.6s ease infinite alternate;
+}
+
+.knock-btn:hover {
+    background: #e05555;
+    color: #fff;
 }
 
 .couch-progress {

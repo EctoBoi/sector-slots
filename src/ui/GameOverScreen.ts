@@ -6,6 +6,8 @@ export interface RunSummary {
     runSpins: number;
     peakBalance: number;
     loansThisRun: number;
+    highestSingleWin: number;
+    runNet: number;
 }
 
 const FLAVOR: Record<GameOverReason, string> = {
@@ -26,16 +28,18 @@ export class GameOverScreen {
 
     show(summary: RunSummary, records: AllTimeRecords, reason: GameOverReason): void {
         const fmt = (n: number) => `$${n.toFixed(2)}`;
+        const fmtSigned = (n: number) => (n >= 0 ? "+" : "-") + `$${Math.abs(n).toFixed(2)}`;
 
         document.getElementById("go-flavor")!.textContent = FLAVOR[reason];
         document.getElementById("go-run-spins")!.textContent = String(summary.runSpins);
         document.getElementById("go-run-peak")!.textContent = fmt(summary.peakBalance);
+        document.getElementById("go-run-highest-win")!.textContent = fmt(summary.highestSingleWin);
+        document.getElementById("go-run-net")!.textContent = fmtSigned(summary.runNet);
         document.getElementById("go-run-bailouts")!.textContent = String(summary.loansThisRun);
 
         document.getElementById("go-rec-highest-balance")!.textContent = fmt(records.highestBalance);
         document.getElementById("go-rec-highest-win")!.textContent = fmt(records.highestSingleWin);
-        const net = records.highestNetGain;
-        document.getElementById("go-rec-highest-net")!.textContent = (net >= 0 ? "+" : "") + fmt(net);
+        document.getElementById("go-rec-highest-net")!.textContent = fmtSigned(records.highestNetGain);
         document.getElementById("go-rec-bailouts")!.textContent = String(records.mostLoans);
         document.getElementById("go-rec-best-run")!.textContent = String(records.bestRunSpins);
         document.getElementById("go-rec-total-spins")!.textContent = String(records.totalSpins);

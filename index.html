@@ -74,7 +74,7 @@
 
             <!-- Bottom controls: lever + denomination -->
             <div class="bottom-controls">
-                <div class="denom-wrapper">
+                <div id="denom-wrapper" class="denom-wrapper">
                     <span class="denom-wrapper-label">Denomination</span>
                     <div class="denom-stepper">
                         <button id="denom-dec" class="denom-btn" aria-label="Decrease denomination" style="background: transparent">−</button>
@@ -101,6 +101,7 @@
             <!-- Couch cushion mechanic -->
             <div class="couch-section">
                 <button id="couch-btn" class="couch-btn hidden">Search Cushions 🪑</button>
+                <button id="knock-btn" class="knock-btn hidden">There's a knock at the door... answer it?</button>
                 <div id="couch-progress" class="couch-progress hidden">
                     <div class="couch-track">
                         <div class="couch-bar"></div>
@@ -301,6 +302,8 @@
                         <h3>This Run</h3>
                         <div class="go-row"><span>Spins</span><span id="go-run-spins">0</span></div>
                         <div class="go-row"><span>Peak Balance</span><span id="go-run-peak">$0.00</span></div>
+                        <div class="go-row"><span>Best Win</span><span id="go-run-highest-win">$0.00</span></div>
+                        <div class="go-row"><span>Net Gain/Loss</span><span id="go-run-net">$0.00</span></div>
                         <div class="go-row"><span>Loans Taken</span><span id="go-run-bailouts">0</span></div>
                     </div>
                     <div class="go-section">

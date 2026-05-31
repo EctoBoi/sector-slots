@@ -27,6 +27,7 @@ export interface PlayerState {
     debts: DebtRecord[];
     nextLoanIndex: number;
     loansThisRun: number;
+    highestSingleWin: number;
     records: AllTimeRecords;
 }
 
@@ -71,6 +72,7 @@ export function loadState(startingBalance: number, defaultDenomination: number):
                 debts: rawDebts.map(parseDebt).filter((d): d is DebtRecord => d !== null),
                 nextLoanIndex: typeof parsed.nextLoanIndex === "number" ? parsed.nextLoanIndex : 1,
                 loansThisRun: typeof parsed.loansThisRun === "number" ? parsed.loansThisRun : 0,
+                highestSingleWin: typeof parsed.highestSingleWin === "number" ? parsed.highestSingleWin : 0,
                 records: parseRecords(parsed.records),
             };
         }
@@ -88,6 +90,7 @@ export function loadState(startingBalance: number, defaultDenomination: number):
         debts: [],
         nextLoanIndex: 1,
         loansThisRun: 0,
+        highestSingleWin: 0,
         records: defaultRecords(),
     };
 }
