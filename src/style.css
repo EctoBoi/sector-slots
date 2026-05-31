@@ -571,7 +571,7 @@ body {
     border: 1px solid rgba(224, 201, 110, 0.2);
     border-radius: 8px;
     padding: 8px 16px;
-    width: 90%;
+    width: 100%;
     max-width: 400px;
 }
 
@@ -1711,6 +1711,52 @@ body {
     border: 1px solid rgba(224, 201, 110, 0.18);
     border-radius: 8px;
     padding: 12px 16px;
+}
+
+/* ─── Custom Scrollbars ──────────────────────────────────────────────────── */
+.rules-panel::-webkit-scrollbar,
+.debt-panel::-webkit-scrollbar,
+.settings-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.rules-panel::-webkit-scrollbar-track,
+.debt-panel::-webkit-scrollbar-track,
+.settings-panel::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 3px;
+}
+
+.rules-panel::-webkit-scrollbar-thumb,
+.settings-panel::-webkit-scrollbar-thumb {
+    background: rgba(224, 201, 110, 0.35);
+    border-radius: 3px;
+}
+
+.rules-panel::-webkit-scrollbar-thumb:hover,
+.settings-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(224, 201, 110, 0.65);
+}
+
+.debt-panel::-webkit-scrollbar-thumb {
+    background: rgba(248, 113, 113, 0.45);
+    border-radius: 3px;
+}
+
+.debt-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(248, 113, 113, 0.7);
+}
+
+/* Firefox */
+.rules-panel,
+.settings-panel {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(224, 201, 110, 0.35) rgba(255, 255, 255, 0.04);
+}
+
+.debt-panel {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(248, 113, 113, 0.45) rgba(255, 255, 255, 0.04);
 }
 
 /* ─── Responsive / Mobile ────────────────────────────────────────────────── */
