@@ -13,7 +13,7 @@ import { CouchCushion } from "./ui/CouchCushion";
 import { DebtPanel } from "./ui/DebtPanel";
 import { GameOverScreen, type GameOverReason } from "./ui/GameOverScreen";
 import { SoundManager } from "./audio/SoundManager";
-import { DENOMINATIONS } from "./constants/payouts";
+import { DENOMINATIONS, ENCLOSURE_TIERS, PAYOUT_MULTIPLIERS } from "./constants/payouts";
 
 // ─── State ────────────────────────────────────────────────────────────────────
 const state = loadState(CONFIG.startingBalance, CONFIG.denomination);
@@ -68,6 +68,32 @@ const forceResetBtn = document.getElementById("force-reset-btn") as HTMLButtonEl
 const newRunBtn = document.getElementById("new-run-btn") as HTMLButtonElement;
 
 // ─── Rules modal ──────────────────────────────────────────────────────────────
+(function populateRulesTiers() {
+    const tbody = document.getElementById("rules-tiers-body")!;
+    const tierLabels: Record<string, string> = {
+        small: "Small",
+        medium: "Medium",
+        large: "Large",
+        jackpot: "Jackpot",
+        mega_jackpot: "Mega Jackpot",
+    };
+    const tierCssClass: Record<string, string> = {
+        small: "tier-small",
+        medium: "tier-medium",
+        large: "tier-large",
+        jackpot: "tier-jackpot",
+        mega_jackpot: "tier-mega",
+    };
+    // ENCLOSURE_TIERS is ordered descending; reverse for display (smallest first)
+    [...ENCLOSURE_TIERS].reverse().forEach(([minCells, tier]) => {
+        const multiplier = PAYOUT_MULTIPLIERS[tier];
+        const tr = document.createElement("tr");
+        tr.className = tierCssClass[tier] ?? "";
+        tr.innerHTML = `<td>${tierLabels[tier] ?? tier}</td><td>${minCells}</td><td>${multiplier}\u00d7</td>`;
+        tbody.appendChild(tr);
+    });
+})();
+
 rulesBtn.addEventListener("click", () => rulesModal.classList.remove("hidden"));
 rulesClose.addEventListener("click", () => rulesModal.classList.add("hidden"));
 rulesOverlay.addEventListener("click", () => rulesModal.classList.add("hidden"));

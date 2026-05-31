@@ -22,17 +22,14 @@ export const SYMBOLS: Symbol[] = [
 ];
 
 // 7 values, must sum to 1.0
-// Each corner/tunnel contributes 2 wall segments instead of 1, boosting enclosure frequency.
-// Blank is the engagement knob: lower blank → denser walls → more frequent (smaller) wins.
-// blank=0.56 → ~34% hit rate, ~97% RTP  (with multipliers 2/5/15/60/300)
 export const DEFAULT_SYMBOL_WEIGHTS: number[] = [
-    0.0734, // 0  TL Corner
-    0.0734, // 1  TR Corner
-    0.0733, // 2  BR Corner
-    0.0733, // 3  BL Corner
-    0.0733, // 4  V Tunnel
-    0.0733, // 5  H Tunnel
-    0.56, // 6  Blank  — 2×0.0734 + 4×0.0733 + 0.56 = 1.00
+    0.079, // 0  TL Corner
+    0.079, // 1  TR Corner
+    0.078, // 2  BR Corner
+    0.078, // 3  BL Corner
+    0.078, // 4  V Tunnel
+    0.078, // 5  H Tunnel
+    0.53, // 6  Blank
 ];
 
 export function weightedRandom(weights: number[]): number {

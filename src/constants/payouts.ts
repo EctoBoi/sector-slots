@@ -3,9 +3,9 @@ export type PayoutTier = "small" | "medium" | "large" | "jackpot" | "mega_jackpo
 // Enclosure payout tiers: [minimumCellCount, tier], checked in descending order.
 // Any enclosed region of N cells awards the first tier where N >= minimum.
 export const ENCLOSURE_TIERS: [number, PayoutTier][] = [
-    [14, "mega_jackpot"],
-    [10, "jackpot"],
-    [7, "large"],
+    [12, "mega_jackpot"],
+    [9, "jackpot"],
+    [5, "large"],
     [3, "medium"],
     [1, "small"],
 ];
@@ -20,9 +20,9 @@ export const DEFAULT_DENOMINATION = 1.0; // index 4
 export const SPIN_COST_MULTIPLIER = 1; // spin costs 1× denomination
 
 export const PAYOUT_MULTIPLIERS: Record<PayoutTier, number> = {
-    small: 2,
-    medium: 5,
-    large: 20,
+    small: 1.5,
+    medium: 3,
+    large: 15,
     jackpot: 100,
     mega_jackpot: 1000,
 };

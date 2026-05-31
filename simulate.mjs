@@ -16,13 +16,13 @@ const BORDERS = [
 ];
 
 const SYMBOL_WEIGHTS = [
-    0.0734, // 0  TL Corner
-    0.0734, // 1  TR Corner
-    0.0733, // 2  BR Corner
-    0.0733, // 3  BL Corner
-    0.0733, // 4  V Tunnel
-    0.0733, // 5  H Tunnel
-    0.56, // 6  Blank  — 2×0.0734 + 4×0.0733 + 0.56 = 1.00
+    0.079, // 0  TL Corner
+    0.079, // 1  TR Corner
+    0.078, // 2  BR Corner
+    0.078, // 3  BL Corner
+    0.078, // 4  V Tunnel
+    0.078, // 5  H Tunnel
+    0.53, // 6  Blank
 ];
 
 function weightedRandom(weights) {
@@ -41,18 +41,18 @@ function randomizeGrid() {
 
 // ─── Payouts ──────────────────────────────────────────────────────────────────
 const PAYOUT_MULTIPLIERS = {
-    small: 2,
-    medium: 5,
-    large: 20,
+    small: 1.5,
+    medium: 3,
+    large: 15,
     jackpot: 100,
     mega_jackpot: 1000,
 };
 
 // [minimumCellCount, tier], checked in descending order
 const ENCLOSURE_TIERS = [
-    [14, "mega_jackpot"],
-    [10, "jackpot"],
-    [7, "large"],
+    [12, "mega_jackpot"],
+    [9, "jackpot"],
+    [5, "large"],
     [3, "medium"],
     [1, "small"],
 ];
