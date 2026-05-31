@@ -18,6 +18,15 @@
             .settings-modal.hidden {
                 display: none !important;
             }
+            .debt-backdrop.hidden {
+                display: none !important;
+            }
+            .debt-panel.hidden {
+                display: none !important;
+            }
+            .game-over-screen.hidden {
+                display: none !important;
+            }
         </style>
     </head>
     <body style="background-color: #0d0d1a">
@@ -32,7 +41,7 @@
                 <button id="settings-btn" class="settings-btn" aria-label="Settings" style="background: transparent">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="13" height="13" aria-hidden="true">
                         <path
-                            d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.72L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.72C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.28L4.34,18.73C4.46,18.95 4.73,19.05 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.05 19.54,18.95 19.66,18.73L21.66,15.28C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
+                            d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"
                         />
                     </svg>
                 </button>
@@ -72,6 +81,7 @@
                         <span id="denom-value" class="denom-display">$1.00</span>
                         <button id="denom-inc" class="denom-btn" aria-label="Increase denomination" style="background: transparent">+</button>
                     </div>
+                    <input type="range" id="denom-slider" class="denom-slider" min="0" max="40" step="1" value="4" aria-label="Denomination slider" />
                 </div>
                 <div id="lever" class="lever" role="button" aria-label="Pull lever to spin" tabindex="0">
                     <div class="lever-track">
@@ -80,11 +90,9 @@
                     <div class="lever-base"></div>
                     <div class="lever-foot"></div>
                 </div>
-            </div>
-
-            <!-- Win display overlay -->
-            <div id="win-display" class="win-display hidden">
-                <div id="win-text" class="win-text"></div>
+                <div class="debt-wrapper">
+                    <button id="debt-btn" class="debt-btn hidden" aria-label="Open debt ledger" style="background: transparent">DEBT $0.00</button>
+                </div>
             </div>
 
             <!-- Broke message -->
@@ -100,6 +108,11 @@
                     <p class="couch-label">Searching cushions…</p>
                 </div>
                 <p id="couch-found" class="couch-found hidden"></p>
+            </div>
+
+            <!-- Win display overlay -->
+            <div id="win-display" class="win-display hidden">
+                <div id="win-text" class="win-text"></div>
             </div>
         </div>
 
@@ -173,36 +186,74 @@
                     <p>Running low? Search the couch cushions for spare change, it might get you back on your feet!</p>
                 </section>
 
-                <section class="rules-section rules-rtp">
-                    <span class="rtp-label">Return to Player (RTP)</span>
-                    <span class="rtp-value">98.1%</span>
+                <section class="rules-section">
+                    <h3>Loans &amp; Debt</h3>
+                    <p>
+                        When you can't afford a spin, open the <strong>LOAN</strong> panel. Each loan adds a fixed amount to your balance and charges
+                        <strong>compound interest every spin</strong>, your debt grows whether you win or not. Repay any amount at any time to reduce interest.
+                    </p>
+                    <p style="margin-top: 8px">
+                        If your <strong>total debt hits $3,000</strong> they will give you one chance to repay before the house comes knocking. Later loans
+                        carry steeper rates, so borrow carefully.
+                    </p>
                 </section>
 
-                <section class="rules-section rules-stats">
-                    <div class="stats-row">
-                        <span class="stats-label">Total Won</span>
-                        <span id="stats-won" class="stats-value stats-positive">$0.00</span>
-                    </div>
-                    <div class="stats-row">
-                        <span class="stats-label">Total Lost</span>
-                        <span id="stats-lost" class="stats-value stats-negative">$0.00</span>
-                    </div>
-                    <div class="stats-row">
-                        <span class="stats-label">Net Gain</span>
-                        <span id="stats-net" class="stats-value">$0.00</span>
-                    </div>
+                <section class="rules-section rules-rtp" style="margin-top: 0">
+                    <span class="rtp-label">Return to Player (RTP)</span>
+                    <span class="rtp-value">98.1%</span>
                 </section>
             </div>
         </div>
 
-        <!-- Settings Modal -->
+        <!-- Player Modal -->
         <div id="settings-modal" class="settings-modal hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title">
             <div class="settings-overlay"></div>
             <div class="settings-panel">
-                <button id="settings-close" class="rules-close" aria-label="Close settings">&times;</button>
-                <h2 id="settings-title" class="rules-title">SETTINGS</h2>
+                <button id="settings-close" class="rules-close" aria-label="Close player stats">&times;</button>
+                <h2 id="settings-title" class="rules-title">PLAYER</h2>
 
                 <div class="settings-section">
+                    <p class="player-section-label">This Run</p>
+                    <div class="rules-stats">
+                        <div class="stats-row">
+                            <span class="stats-label">Total Won</span>
+                            <span id="stats-won" class="stats-value stats-positive">$0.00</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">Total Lost</span>
+                            <span id="stats-lost" class="stats-value stats-negative">$0.00</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">Net Gain</span>
+                            <span id="stats-net" class="stats-value">$0.00</span>
+                        </div>
+                    </div>
+
+                    <p class="player-section-label" style="margin-top: 16px">All-Time Records</p>
+                    <div class="player-records">
+                        <div class="stats-row">
+                            <span class="stats-label">Highest Balance</span>
+                            <span id="player-rec-highest-balance" class="stats-value">$0.00</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">Best Single Win</span>
+                            <span id="player-rec-highest-win" class="stats-value">$0.00</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">Most Loans</span>
+                            <span id="player-rec-bailouts" class="stats-value">0</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">Most Spins</span>
+                            <span id="player-rec-best-run" class="stats-value">0</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stats-label">Total Spins</span>
+                            <span id="player-rec-total-spins" class="stats-value">0</span>
+                        </div>
+                    </div>
+
+                    <p class="player-section-label" style="margin-top: 16px">Sound</p>
                     <div class="settings-row">
                         <span class="settings-label">Sound Effects</span>
                         <label class="toggle-switch">
@@ -210,11 +261,54 @@
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <div class="settings-row">
+                    <div class="settings-row" style="margin-top: 12px">
                         <span class="settings-label">Volume</span>
                         <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5" class="volume-slider" />
                     </div>
+
+                    <p class="player-section-label" style="margin-top: 20px">Danger Zone</p>
+                    <button id="new-run-btn" class="new-run-btn">Start New Run</button>
+                    <button id="force-reset-btn" class="force-reset-btn">Reset All Data</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Debt Backdrop -->
+        <div id="debt-backdrop" class="debt-backdrop hidden"></div>
+
+        <!-- Debt Panel (slide-up) -->
+        <div id="debt-panel" class="debt-panel hidden">
+            <div class="debt-panel-header">
+                <span class="debt-panel-title">DEBT LEDGER</span>
+                <button id="debt-panel-close" class="rules-close" aria-label="Close debt panel">&times;</button>
+            </div>
+            <div id="debt-list" class="debt-list"></div>
+            <div id="debt-total" class="debt-total"></div>
+            <button id="loan-btn" class="loan-btn">Request Loan 💸</button>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="game-over-screen hidden">
+            <div class="go-content">
+                <h2 class="go-title">GAME OVER</h2>
+                <p id="go-flavor" class="go-flavor"></p>
+                <div class="go-columns">
+                    <div class="go-section">
+                        <h3>This Run</h3>
+                        <div class="go-row"><span>Spins</span><span id="go-run-spins">0</span></div>
+                        <div class="go-row"><span>Peak Balance</span><span id="go-run-peak">$0.00</span></div>
+                        <div class="go-row"><span>Loans Taken</span><span id="go-run-bailouts">0</span></div>
+                    </div>
+                    <div class="go-section">
+                        <h3>All-Time</h3>
+                        <div class="go-row"><span>Highest Balance</span><span id="go-rec-highest-balance">$0.00</span></div>
+                        <div class="go-row"><span>Best Win</span><span id="go-rec-highest-win">$0.00</span></div>
+                        <div class="go-row"><span>Most Loans</span><span id="go-rec-bailouts">0</span></div>
+                        <div class="go-row"><span>Most Spins</span><span id="go-rec-best-run">0</span></div>
+                        <div class="go-row"><span>Total Spins</span><span id="go-rec-total-spins">0</span></div>
+                    </div>
+                </div>
+                <button id="play-again-btn" class="play-again-btn">Play Again</button>
             </div>
         </div>
 

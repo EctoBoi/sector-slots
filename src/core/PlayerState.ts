@@ -1,5 +1,20 @@
 const STORAGE_KEY = "sectorSlots_playerState";
 
+export interface DebtRecord {
+    id: number;
+    originalAmount: number;
+    currentBalance: number;
+    rate: number;
+}
+
+export interface AllTimeRecords {
+    highestBalance: number;
+    highestSingleWin: number;
+    mostLoans: number;
+    bestRunSpins: number;
+    totalSpins: number;
+}
+
 export interface PlayerState {
     balance: number;
     totalSpins: number;
@@ -8,6 +23,39 @@ export interface PlayerState {
     highestBalance: number;
     totalAmountWon: number;
     totalAmountLost: number;
+    debts: DebtRecord[];
+    nextLoanIndex: number;
+    loansThisRun: number;
+    records: AllTimeRecords;
+}
+
+function defaultRecords(): AllTimeRecords {
+    return { highestBalance: 0, highestSingleWin: 0, mostLoans: 0, bestRunSpins: 0, totalSpins: 0 };
+}
+
+function parseDebt(d: unknown): DebtRecord | null {
+    if (!d || typeof d !== "object") return null;
+    const o = d as Record<string, unknown>;
+    if (
+        typeof o.id !== "number" ||
+        typeof o.originalAmount !== "number" ||
+        typeof o.currentBalance !== "number" ||
+        typeof o.rate !== "number"
+    )
+        return null;
+    return o as unknown as DebtRecord;
+}
+
+function parseRecords(r: unknown): AllTimeRecords {
+    if (!r || typeof r !== "object") return defaultRecords();
+    const o = r as Record<string, unknown>;
+    return {
+        highestBalance: typeof o.highestBalance === "number" ? o.highestBalance : 0,
+        highestSingleWin: typeof o.highestSingleWin === "number" ? o.highestSingleWin : 0,
+        mostLoans: typeof o.mostLoans === "number" ? o.mostLoans : 0,
+        bestRunSpins: typeof o.bestRunSpins === "number" ? o.bestRunSpins : 0,
+        totalSpins: typeof o.totalSpins === "number" ? o.totalSpins : 0,
+    };
 }
 
 export function loadState(startingBalance: number, defaultDenomination: number): PlayerState {
@@ -15,6 +63,7 @@ export function loadState(startingBalance: number, defaultDenomination: number):
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
             const parsed = JSON.parse(raw) as Partial<PlayerState>;
+            const rawDebts = Array.isArray(parsed.debts) ? parsed.debts : [];
             return {
                 balance: typeof parsed.balance === "number" ? parsed.balance : startingBalance,
                 totalSpins: typeof parsed.totalSpins === "number" ? parsed.totalSpins : 0,
@@ -23,6 +72,10 @@ export function loadState(startingBalance: number, defaultDenomination: number):
                 highestBalance: typeof parsed.highestBalance === "number" ? parsed.highestBalance : startingBalance,
                 totalAmountWon: typeof parsed.totalAmountWon === "number" ? parsed.totalAmountWon : 0,
                 totalAmountLost: typeof parsed.totalAmountLost === "number" ? parsed.totalAmountLost : 0,
+                debts: rawDebts.map(parseDebt).filter((d): d is DebtRecord => d !== null),
+                nextLoanIndex: typeof parsed.nextLoanIndex === "number" ? parsed.nextLoanIndex : 1,
+                loansThisRun: typeof parsed.loansThisRun === "number" ? parsed.loansThisRun : 0,
+                records: parseRecords(parsed.records),
             };
         }
     } catch {
@@ -36,6 +89,10 @@ export function loadState(startingBalance: number, defaultDenomination: number):
         highestBalance: startingBalance,
         totalAmountWon: 0,
         totalAmountLost: 0,
+        debts: [],
+        nextLoanIndex: 1,
+        loansThisRun: 0,
+        records: defaultRecords(),
     };
 }
 

@@ -1,20 +1,27 @@
 import "./style.css";
-import { CONFIG } from "./constants/config";
+import { CONFIG, DEBT_CEILING } from "./constants/config";
 import { createEmptyGrid, randomizeGrid } from "./core/Grid";
 import { detectAllPatterns } from "./core/PatternDetector";
 import { calculatePayout } from "./core/RewardCalculator";
 import { loadState, saveState } from "./core/PlayerState";
+import * as DebtManager from "./core/DebtManager";
 import { GridRenderer } from "./ui/GridRenderer";
 import { Lever } from "./ui/Lever";
 import { WinDisplay } from "./ui/WinDisplay";
 import { BalanceDisplay } from "./ui/BalanceDisplay";
 import { CouchCushion } from "./ui/CouchCushion";
+import { DebtPanel } from "./ui/DebtPanel";
+import { GameOverScreen, type GameOverReason } from "./ui/GameOverScreen";
 import { SoundManager } from "./audio/SoundManager";
 import { DENOMINATIONS } from "./constants/payouts";
 
 // ─── State ────────────────────────────────────────────────────────────────────
 const state = loadState(CONFIG.startingBalance, CONFIG.denomination);
 let isSpinning = false;
+let isGameOver = false;
+let isOverDebtLimit = DebtManager.isDebtCeilingHit(state);
+// One couch search allowed when ceiling hit but balance can't cover excess
+let isDebtCrisisSearch = false;
 
 // ─── DOM refs ─────────────────────────────────────────────────────────────────
 const gridContainer = document.getElementById("grid-container")!;
@@ -45,6 +52,18 @@ const volumeSlider = document.getElementById("volume-slider") as HTMLInputElemen
 const statsWonEl = document.getElementById("stats-won")!;
 const statsLostEl = document.getElementById("stats-lost")!;
 const statsNetEl = document.getElementById("stats-net")!;
+const debtBtnEl = document.getElementById("debt-btn")!;
+const debtPanelEl = document.getElementById("debt-panel")!;
+const debtBackdropEl = document.getElementById("debt-backdrop")!;
+const gameOverEl = document.getElementById("game-over-screen")!;
+const denomSliderEl = document.getElementById("denom-slider") as HTMLInputElement;
+const playerRecHighestBalanceEl = document.getElementById("player-rec-highest-balance")!;
+const playerRecHighestWinEl = document.getElementById("player-rec-highest-win")!;
+const playerRecBailoutsEl = document.getElementById("player-rec-bailouts")!;
+const playerRecBestRunEl = document.getElementById("player-rec-best-run")!;
+const playerRecTotalSpinsEl = document.getElementById("player-rec-total-spins")!;
+const forceResetBtn = document.getElementById("force-reset-btn") as HTMLButtonElement;
+const newRunBtn = document.getElementById("new-run-btn") as HTMLButtonElement;
 
 // ─── Rules modal ──────────────────────────────────────────────────────────────
 rulesBtn.addEventListener("click", () => rulesModal.classList.remove("hidden"));
@@ -57,8 +76,11 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-// ─── Settings modal ───────────────────────────────────────────────────────────
-settingsBtn.addEventListener("click", () => settingsModal.classList.remove("hidden"));
+// ─── Settings (Player) modal ──────────────────────────────────────────────────
+settingsBtn.addEventListener("click", () => {
+    updatePlayerModal();
+    settingsModal.classList.remove("hidden");
+});
 settingsClose.addEventListener("click", () => settingsModal.classList.add("hidden"));
 settingsOverlay.addEventListener("click", () => settingsModal.classList.add("hidden"));
 
@@ -86,6 +108,44 @@ volumeSlider.addEventListener("input", () => {
     localStorage.setItem("sectorSlots_volume", volumeSlider.value);
 });
 
+// ─── Start new run ──────────────────────────────────────────────────────────
+newRunBtn.addEventListener("click", () => {
+    isGameOver = false;
+    state.denomination = CONFIG.denomination;
+    denomIndex = Math.max(0, DENOMINATIONS.indexOf(CONFIG.denomination));
+    resetRunState();
+    settingsModal.classList.add("hidden");
+});
+
+// ─── Force reset ─────────────────────────────────────────────────────────────
+let resetConfirmPending = false;
+let resetConfirmTimer: ReturnType<typeof setTimeout> | null = null;
+
+forceResetBtn.addEventListener("click", () => {
+    if (!resetConfirmPending) {
+        resetConfirmPending = true;
+        forceResetBtn.textContent = "Confirm? (Click again)";
+        forceResetBtn.classList.add("force-reset-btn--confirm");
+        resetConfirmTimer = setTimeout(() => {
+            resetConfirmPending = false;
+            forceResetBtn.textContent = "Reset All Data";
+            forceResetBtn.classList.remove("force-reset-btn--confirm");
+        }, 3000);
+    } else {
+        if (resetConfirmTimer) clearTimeout(resetConfirmTimer);
+        resetConfirmPending = false;
+        forceResetBtn.textContent = "Reset All Data";
+        forceResetBtn.classList.remove("force-reset-btn--confirm");
+
+        isGameOver = false;
+        state.records = { highestBalance: 0, highestSingleWin: 0, mostLoans: 0, bestRunSpins: 0, totalSpins: 0 };
+        state.denomination = CONFIG.denomination;
+        denomIndex = Math.max(0, DENOMINATIONS.indexOf(CONFIG.denomination));
+        resetRunState();
+        settingsModal.classList.add("hidden");
+    }
+});
+
 // ─── Denomination stepper ─────────────────────────────────────────────────────
 let denomIndex = Math.max(0, DENOMINATIONS.indexOf(state.denomination));
 
@@ -93,6 +153,7 @@ function updateDenomUI(): void {
     denomValueEl.textContent = `$${DENOMINATIONS[denomIndex].toFixed(2)}`;
     denomDecBtn.disabled = denomIndex === 0;
     denomIncBtn.disabled = denomIndex === DENOMINATIONS.length - 1;
+    denomSliderEl.value = String(denomIndex);
 }
 
 denomDecBtn.addEventListener("click", () => {
@@ -115,6 +176,14 @@ denomIncBtn.addEventListener("click", () => {
     }
 });
 
+denomSliderEl.addEventListener("input", () => {
+    denomIndex = parseInt(denomSliderEl.value);
+    state.denomination = DENOMINATIONS[denomIndex];
+    saveState(state);
+    updateDenomUI();
+    updateUI();
+});
+
 updateDenomUI();
 
 // ─── Subsystems ───────────────────────────────────────────────────────────────
@@ -125,8 +194,49 @@ if (savedSoundEnabled !== null) sound.setEnabled(savedSoundEnabled !== "false");
 const gridRenderer = new GridRenderer(gridContainer);
 const balanceDisp = new BalanceDisplay(balanceEl, lastWinEl, spinsEl, highestBalanceEl);
 const winDisp = new WinDisplay(winContainerEl, winTextEl);
-const couch = new CouchCushion(couchBtnEl, couchProgressEl, couchFoundEl, onCouchComplete, sound);
+// couch and debtPanel reference each other via closures — both safe since
+// closures are called only after construction completes.
+const couch = new CouchCushion(
+    couchBtnEl,
+    couchProgressEl,
+    couchFoundEl,
+    onCouchComplete,
+    () => {
+        if (isDebtCrisisSearch) {
+            // Failed crisis search — show message then game over
+            isDebtCrisisSearch = false;
+            couchFoundEl.textContent = "Not enough to pay off the debt...";
+            couchFoundEl.classList.remove("hidden");
+            setTimeout(() => {
+                couchFoundEl.classList.add("hidden");
+                triggerGameOver("ceiling");
+            }, 1800);
+        } else if (DebtManager.canTakeLoan(state)) {
+            debtPanel.open();
+        } else {
+            triggerGameOver("couch");
+        }
+    },
+    sound,
+);
 const lever = new Lever(leverEl, onLeverPull, sound);
+const debtPanel = new DebtPanel(
+    debtPanelEl,
+    debtBackdropEl,
+    state,
+    () => updateUI(),
+    () => couch.resetSearchCount(),
+);
+const gameOverScreen = new GameOverScreen(gameOverEl, () => {
+    isGameOver = false;
+    isOverDebtLimit = false;
+    winDisp.hide();
+    updateDenomUI();
+    updateUI();
+    lever.enable();
+    gridRenderer.renderGrid(createEmptyGrid());
+});
+debtBtnEl.addEventListener("click", () => debtPanel.open());
 
 // ─── Initial render ───────────────────────────────────────────────────────────
 gridRenderer.renderGrid(createEmptyGrid());
@@ -134,7 +244,7 @@ updateUI();
 
 // ─── Spin logic ───────────────────────────────────────────────────────────────
 function onLeverPull(): void {
-    if (isSpinning) return;
+    if (isSpinning || isGameOver || isOverDebtLimit) return;
 
     const cost = state.denomination;
     const balance = Math.round(state.balance * 100) / 100;
@@ -150,11 +260,12 @@ function onLeverPull(): void {
     state.balance = Math.round((state.balance - cost) * 100) / 100;
     state.totalSpins += 1;
     state.totalAmountLost = Math.round((state.totalAmountLost + cost) * 100) / 100;
-    saveState(state);
-    updateUI();
 
     isSpinning = true;
     lever.disable();
+    saveState(state);
+    updateUI();
+
     sound.play("spin");
 
     const newGrid = randomizeGrid(CONFIG.symbolWeights);
@@ -162,7 +273,6 @@ function onLeverPull(): void {
     gridRenderer.animateSpin(newGrid, () => {
         sound.stop("spin");
         isSpinning = false;
-        setTimeout(() => {}, 300);
 
         const matches = detectAllPatterns(newGrid);
         const reward = calculatePayout(matches, state.denomination);
@@ -171,19 +281,48 @@ function onLeverPull(): void {
             state.balance += reward.totalPayout;
             state.lastWin = reward.totalPayout;
             state.totalAmountWon = Math.round((state.totalAmountWon + reward.totalPayout) * 100) / 100;
+            if (reward.totalPayout > state.records.highestSingleWin) {
+                state.records.highestSingleWin = reward.totalPayout;
+            }
             sound.playWinTier(reward.highestTier);
             gridRenderer.highlightMatches(matches);
             winDisp.show(reward, state.denomination);
-            setTimeout(() => {
-                lever.enable();
-            }, 350);
         } else {
             winDisp.hide();
-            lever.enable();
+        }
+
+        // Tick interest on all active debts, track playthrough
+        DebtManager.tickInterest(state);
+
+        // Flash debt button if any debts exist
+        if (state.debts.length > 0) {
+            debtBtnEl.classList.add("debt-btn--pulse");
+            setTimeout(() => debtBtnEl.classList.remove("debt-btn--pulse"), 900);
         }
 
         saveState(state);
         updateUI();
+
+        if (DebtManager.isDebtCeilingHit(state)) {
+            const totalDebt = DebtManager.getTotalDebt(state);
+            const excess = Math.round((totalDebt - DEBT_CEILING) * 100) / 100;
+            if (state.balance >= excess) {
+                // Player can pay down, giving them a grace period
+                isOverDebtLimit = true;
+                updateUI();
+            } else {
+                // Not enough balance - allow one couch search as last resort
+                isDebtCrisisSearch = true;
+                updateUI();
+            }
+            return;
+        }
+
+        if (reward.totalPayout > 0) {
+            setTimeout(() => lever.enable(), 350);
+        } else {
+            lever.enable();
+        }
     });
 }
 
@@ -191,7 +330,97 @@ function onCouchComplete(amount: number): void {
     state.balance += amount;
     state.lastWin = amount;
     saveState(state);
+
+    if (isDebtCrisisSearch) {
+        isDebtCrisisSearch = false;
+        const totalDebt = DebtManager.getTotalDebt(state);
+        const excess = Math.round((totalDebt - DEBT_CEILING) * 100) / 100;
+        if (state.balance >= excess) {
+            // Now have enough to pay down - enter grace period
+            isOverDebtLimit = true;
+            updateUI();
+        } else {
+            // Still not enough - show message then game over
+            lever.disable();
+            couch.setVisible(false);
+            couchFoundEl.textContent = "Not enough to pay off the debt...";
+            couchFoundEl.classList.remove("hidden");
+            setTimeout(() => {
+                couchFoundEl.classList.add("hidden");
+                triggerGameOver("ceiling");
+            }, 1800);
+        }
+        return;
+    }
+
     updateUI();
+}
+
+// ─── Shared run-state reset ─────────────────────────────────────────────────────────
+function resetRunState(): void {
+    isSpinning = false;
+    isOverDebtLimit = false;
+    isDebtCrisisSearch = false;
+
+    state.balance = CONFIG.startingBalance;
+    state.totalSpins = 0;
+    state.lastWin = 0;
+    state.highestBalance = CONFIG.startingBalance;
+    state.totalAmountWon = 0;
+    state.totalAmountLost = 0;
+    state.debts = [];
+    state.nextLoanIndex = 1;
+    state.loansThisRun = 0;
+
+    saveState(state);
+    winDisp.hide();
+    debtPanel.close();
+    lever.enable();
+    gridRenderer.renderGrid(createEmptyGrid());
+    updateDenomUI();
+    updateUI();
+}
+
+function triggerGameOver(reason: GameOverReason): void {
+    if (isGameOver) return;
+    isGameOver = true;
+
+    const summary = {
+        runSpins: state.totalSpins,
+        peakBalance: state.highestBalance,
+        loansThisRun: state.loansThisRun,
+    };
+
+    // Update all-time records before resetting run state
+    if (state.highestBalance > state.records.highestBalance) {
+        state.records.highestBalance = state.highestBalance;
+    }
+    if (state.totalSpins > state.records.bestRunSpins) {
+        state.records.bestRunSpins = state.totalSpins;
+    }
+    if (state.loansThisRun > state.records.mostLoans) {
+        state.records.mostLoans = state.loansThisRun;
+    }
+    state.records.totalSpins += state.totalSpins;
+
+    resetRunState();
+    gameOverScreen.show(summary, state.records, reason);
+}
+
+function updatePlayerModal(): void {
+    const net = Math.round((state.totalAmountWon - state.totalAmountLost) * 100) / 100;
+    statsWonEl.textContent = `$${state.totalAmountWon.toFixed(2)}`;
+    statsLostEl.textContent = `$${state.totalAmountLost.toFixed(2)}`;
+    statsNetEl.textContent = (net >= 0 ? "+" : "") + `$${net.toFixed(2)}`;
+    statsNetEl.className = "stats-value" + (net > 0 ? " stats-positive" : net < 0 ? " stats-negative" : "");
+
+    const rec = state.records;
+    playerRecHighestBalanceEl.textContent = `$${rec.highestBalance.toFixed(2)}`;
+    playerRecHighestWinEl.textContent = `$${rec.highestSingleWin.toFixed(2)}`;
+    // Show the best of the committed record or the current run live
+    playerRecBailoutsEl.textContent = String(Math.max(rec.mostLoans, state.loansThisRun));
+    playerRecBestRunEl.textContent = String(Math.max(rec.bestRunSpins, state.totalSpins));
+    playerRecTotalSpinsEl.textContent = String(rec.totalSpins + state.totalSpins);
 }
 
 function updateUI(): void {
@@ -199,14 +428,53 @@ function updateUI(): void {
         state.highestBalance = state.balance;
         saveState(state);
     }
+    if (state.highestBalance > state.records.highestBalance) {
+        state.records.highestBalance = state.highestBalance;
+    }
     balanceDisp.update(state.balance, state.lastWin, state.totalSpins, state.highestBalance);
-    const net = Math.round((state.totalAmountWon - state.totalAmountLost) * 100) / 100;
-    statsWonEl.textContent = `$${state.totalAmountWon.toFixed(2)}`;
-    statsLostEl.textContent = `$${state.totalAmountLost.toFixed(2)}`;
-    statsNetEl.textContent = (net >= 0 ? "+" : "") + `$${net.toFixed(2)}`;
-    statsNetEl.className = "stats-value" + (net > 0 ? " stats-positive" : net < 0 ? " stats-negative" : "");
+
+    // Debt button — always visible; shows debt total when in debt, BAILOUT when clean
+    const totalDebt = DebtManager.getTotalDebt(state);
+    debtBtnEl.classList.remove("hidden");
+    if (totalDebt > 0) {
+        debtBtnEl.textContent = `DEBT $${totalDebt.toFixed(2)}`;
+    } else {
+        debtBtnEl.textContent = "LOAN";
+    }
+
     const spinCost = state.denomination;
     const roundedBalance = Math.round(state.balance * 100) / 100;
-    couch.setVisible(roundedBalance < 0.2);
-    brokeMsg.classList.toggle("hidden", roundedBalance >= spinCost);
+
+    // Clear over-limit state once player has paid debt back under ceiling
+    if (isOverDebtLimit && !DebtManager.isDebtCeilingHit(state)) {
+        isOverDebtLimit = false;
+    }
+
+    if (isOverDebtLimit) {
+        brokeMsg.textContent = "Pay down debt to continue spinning!";
+        brokeMsg.classList.remove("hidden");
+        couch.setVisible(false);
+    } else if (isDebtCrisisSearch) {
+        brokeMsg.textContent = "Search the couch — last chance!";
+        brokeMsg.classList.remove("hidden");
+        couch.setVisible(true);
+    } else {
+        brokeMsg.textContent = "Not enough balance to spin!";
+        couch.setVisible(!isSpinning && roundedBalance < 0.2);
+        brokeMsg.classList.toggle("hidden", isSpinning || roundedBalance >= spinCost);
+    }
+
+    // Manage lever state (only outside of spin / game over)
+    if (!isSpinning && !isGameOver) {
+        if (isOverDebtLimit || isDebtCrisisSearch || roundedBalance < spinCost) {
+            lever.disable();
+        } else {
+            lever.enable();
+        }
+    }
+
+    // Keep player modal live while it's open
+    if (!settingsModal.classList.contains("hidden")) {
+        updatePlayerModal();
+    }
 }

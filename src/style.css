@@ -142,7 +142,6 @@ body {
     transition:
         opacity 0.15s,
         background 0.15s;
-    margin-top: 8px;
 }
 
 .rules-btn:hover {
@@ -629,7 +628,7 @@ body {
     font-size: 0.9rem;
     color: var(--accent);
     font-family: inherit;
-    min-width: 46px;
+    min-width: 72px;
     text-align: center;
 }
 
@@ -741,6 +740,7 @@ body {
 /* ─── Bottom Controls ────────────────────────────────────────────────────── */
 .bottom-controls {
     display: grid;
+    gap: 15%;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     width: 100%;
@@ -753,7 +753,43 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
+    width: 130px;
+}
+
+/* Denomination slider */
+.denom-slider {
+    width: 100%;
+    max-width: 110px;
+    margin-top: 5px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    height: 4px;
+    appearance: none;
+    -webkit-appearance: none;
+    background: rgba(224, 201, 110, 0.2);
+    border-radius: 2px;
+    outline: none;
+}
+
+.denom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(224, 201, 110, 0.5);
+}
+
+.denom-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 6px rgba(224, 201, 110, 0.5);
 }
 
 .denom-wrapper-label {
@@ -957,6 +993,523 @@ body {
     display: none !important;
 }
 
+/* ─── Debt Wrapper (right of lever) ─────────────────────────────────────── */
+.debt-wrapper {
+    grid-column: 3;
+    justify-self: end;
+    display: flex;
+    align-items: center;
+}
+
+.debt-btn {
+    background: transparent;
+    color: #f87171;
+    border: 1px solid #f87171;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-family: inherit;
+    font-size: 0.7rem;
+    font-weight: bold;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    line-height: 1.3;
+    transition:
+        background 0.15s,
+        box-shadow 0.15s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.debt-btn:hover {
+    background: rgba(248, 113, 113, 0.1);
+}
+
+@keyframes debtPulse {
+    0%,
+    100% {
+        box-shadow: none;
+    }
+    50% {
+        box-shadow: 0 0 14px rgba(248, 113, 113, 0.8);
+    }
+}
+
+.debt-btn--pulse {
+    animation: debtPulse 0.9s ease;
+}
+
+/* ─── Debt Backdrop ──────────────────────────────────────────────────────── */
+.debt-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 900;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ─── Debt Panel (slide-up sheet) ────────────────────────────────────────── */
+.debt-panel {
+    position: fixed;
+    margin: 0 auto;
+    max-width: 600px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 950;
+    background: linear-gradient(180deg, #1a1a30 0%, #0d0d1a 100%);
+    border-top: 2px solid #f87171;
+    border-radius: 16px 16px 0 0;
+    padding: 20px 20px env(safe-area-inset-bottom, 20px);
+    max-height: 75vh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.7);
+}
+
+.debt-panel.open {
+    transform: translateY(0);
+}
+
+.debt-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.debt-panel-title {
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    color: #f87171;
+    text-shadow: 0 0 10px rgba(248, 113, 113, 0.45);
+}
+
+/* ─── Debt List ──────────────────────────────────────────────────────────── */
+.debt-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.debt-empty {
+    font-size: 0.8rem;
+    opacity: 0.45;
+    text-align: center;
+    padding: 8px 0;
+}
+
+.debt-row {
+    background: rgba(248, 113, 113, 0.05);
+    border: 1px solid rgba(248, 113, 113, 0.2);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.debt-row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.debt-badge {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    font-weight: bold;
+}
+
+.debt-rate {
+    font-size: 1rem;
+    color: #f87171;
+    font-weight: bold;
+}
+
+.debt-rate-unit {
+    font-size: 0.62rem;
+    font-weight: normal;
+    opacity: 0.7;
+}
+
+.debt-row-balance {
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 0.03em;
+}
+
+.debt-balance--ok {
+    color: #4ade80;
+}
+.debt-balance--warn {
+    color: #facc15;
+}
+.debt-balance--danger {
+    color: #f87171;
+    text-shadow: 0 0 8px rgba(248, 113, 113, 0.45);
+}
+
+.debt-playthrough {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.debt-pt-label {
+    font-size: 0.78rem;
+    opacity: 0.7;
+    letter-spacing: 0.04em;
+}
+
+.debt-pt-track {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.debt-pt-bar {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.25s ease;
+}
+
+.debt-repay-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.debt-repay-input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(224, 201, 110, 0.25);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 6px 8px;
+    outline: none;
+    min-width: 0;
+    -webkit-appearance: none;
+}
+
+.debt-repay-input:focus {
+    border-color: var(--accent);
+}
+
+.debt-repay-btn {
+    background: rgba(224, 201, 110, 0.1);
+    color: var(--accent);
+    border: 1px solid rgba(224, 201, 110, 0.5);
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.debt-repay-btn:hover {
+    background: rgba(224, 201, 110, 0.22);
+}
+
+.debt-repay-max-btn {
+    background: rgba(248, 113, 113, 0.08);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.4);
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.debt-repay-max-btn:hover {
+    background: rgba(248, 113, 113, 0.18);
+}
+
+.debt-total {
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 12px;
+    letter-spacing: 0.06em;
+    color: var(--text);
+    opacity: 0.8;
+}
+
+.debt-total--warn {
+    color: #facc15;
+    border-color: rgba(250, 204, 21, 0.3);
+    opacity: 1;
+}
+
+.debt-total--danger {
+    color: #f87171;
+    border-color: rgba(248, 113, 113, 0.35);
+    text-shadow: 0 0 8px rgba(248, 113, 113, 0.4);
+    opacity: 1;
+}
+
+.loan-btn {
+    width: 100%;
+    margin-right: 10px;
+    margin-bottom: 20px;
+    background: rgba(224, 201, 110, 0.08);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.loan-btn:hover {
+    background: rgba(224, 201, 110, 0.18);
+}
+
+.loan-btn--blocked,
+.loan-btn--blocked:hover {
+    background: rgba(220, 60, 60, 0.12);
+    color: #e05555;
+    border-color: #e05555;
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+/* ─── New Run Button ─────────────────────────────────────────────────────── */
+.new-run-btn {
+    width: 100%;
+    margin-top: 6px;
+    background: rgba(255, 199, 77, 0.1);
+    color: #c48e32;
+    border: 1px solid #c48e32;
+    border-radius: 6px;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition:
+        background 0.15s,
+        color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.new-run-btn:hover {
+    background: rgba(255, 199, 77, 0.22);
+}
+
+/* ─── Force Reset Button ─────────────────────────────────────────────────── */
+.force-reset-btn {
+    width: 100%;
+    margin-top: 6px;
+    background: rgba(220, 60, 60, 0.08);
+    color: #e05555;
+    border: 1px solid #e05555;
+    border-radius: 6px;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition:
+        background 0.15s,
+        color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.force-reset-btn:hover {
+    background: rgba(220, 60, 60, 0.2);
+}
+
+.force-reset-btn--confirm {
+    background: #e05555;
+    color: #fff;
+    animation: pulse-red 0.6s ease infinite alternate;
+}
+
+@keyframes pulse-red {
+    from {
+        box-shadow: 0 0 0 0 rgba(220, 60, 60, 0.5);
+    }
+    to {
+        box-shadow: 0 0 10px 4px rgba(220, 60, 60, 0.3);
+    }
+}
+
+/* ─── Game Over Screen ───────────────────────────────────────────────────── */
+.game-over-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(13, 13, 26, 0.97);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    overflow-y: auto;
+    animation: fadeIn 0.35s ease;
+}
+
+.game-over-screen.hidden {
+    display: none !important;
+}
+
+.go-content {
+    max-width: 480px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+}
+
+.go-title {
+    font-family: "Orbitron", "Courier New", monospace;
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: #f87171;
+    letter-spacing: 0.12em;
+    text-shadow: 0 0 24px rgba(248, 113, 113, 0.6);
+    text-align: center;
+}
+
+.go-flavor {
+    font-size: 0.88rem;
+    color: var(--text);
+    opacity: 0.55;
+    font-style: italic;
+    text-align: center;
+}
+
+.go-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    width: 100%;
+}
+
+.go-section {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(224, 201, 110, 0.14);
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.go-section h3 {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    opacity: 0.65;
+    border-bottom: 1px solid rgba(224, 201, 110, 0.14);
+    padding-bottom: 6px;
+    margin-bottom: 2px;
+}
+
+.go-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
+    gap: 8px;
+}
+
+.go-row span:first-child {
+    opacity: 0.55;
+}
+
+.go-row span:last-child {
+    font-weight: bold;
+    color: var(--accent);
+    text-align: right;
+}
+
+.play-again-btn {
+    background: var(--accent);
+    color: #1a1a2e;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 44px;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: opacity 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    margin-top: 4px;
+}
+
+.play-again-btn:hover {
+    opacity: 0.85;
+}
+
+@media (max-width: 420px) {
+    .go-columns {
+        grid-template-columns: 1fr;
+    }
+
+    .go-title {
+        font-size: 1.8rem;
+    }
+}
+
+/* ─── Player modal extras ────────────────────────────────────────────────── */
+.settings-panel {
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.player-section-label {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    opacity: 0.65;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.player-records {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: rgba(224, 201, 110, 0.04);
+    border: 1px solid rgba(224, 201, 110, 0.18);
+    border-radius: 8px;
+    padding: 12px 16px;
+}
+
 /* ─── Responsive / Mobile ────────────────────────────────────────────────── */
 
 /* ~500px and below: tile 52px — fits ~412px total */
@@ -975,6 +1528,10 @@ body {
 
     .game-header h1 {
         font-size: 1.6rem;
+    }
+
+    .settings-btn {
+        top: calc(42% + 16px);
     }
 
     .bottom-controls {
@@ -1028,6 +1585,18 @@ body {
     .game-header h1 {
         font-size: 1.1rem;
         letter-spacing: 0.12em;
+    }
+
+    .title-slots {
+        font-size: 3rem;
+    }
+
+    .rules-btn {
+        top: 26%;
+    }
+
+    .settings-btn {
+        top: calc(42% + 12px);
     }
 
     .hud {
