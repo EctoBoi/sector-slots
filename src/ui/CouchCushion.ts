@@ -5,8 +5,8 @@ const SEARCH_DURATION_MS = CONFIG.couchSearch.durationMs;
 const MIN_FIND = CONFIG.couchSearch.minFind;
 const MAX_FIND = CONFIG.couchSearch.maxFind;
 
-// Failure chance by search count (1-based). Searches 1-2 always succeed.
-const FAILURE_CHANCE: Record<number, number> = { 3: 0.2, 4: 0.5 };
+// Failure chance by search count (1-based). Only search 1 always succeeds.
+const FAILURE_CHANCE: Record<number, number> = { 2: 0.2, 3: 0.5 };
 const FAILURE_CHANCE_MAX = 0.8;
 
 export class CouchCushion {
@@ -44,7 +44,7 @@ export class CouchCushion {
     }
 
     private getFailureChance(): number {
-        if (this.searchCount <= 2) return 0;
+        if (this.searchCount <= 1) return 0;
         return FAILURE_CHANCE[this.searchCount] ?? FAILURE_CHANCE_MAX;
     }
 
