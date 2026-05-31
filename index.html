@@ -85,7 +85,7 @@
                         <span id="denom-value" class="denom-display">$1.00</span>
                         <button id="denom-inc" class="denom-btn" aria-label="Increase denomination" style="background: transparent">+</button>
                     </div>
-                    <input type="range" id="denom-slider" class="denom-slider" min="0" max="40" step="1" value="4" aria-label="Denomination slider" />
+                    <input type="range" id="denom-slider" class="denom-slider" min="0" max="43" step="1" value="4" aria-label="Denomination slider" />
                 </div>
                 <div id="lever" class="lever" role="button" aria-label="Pull lever to spin" tabindex="0">
                     <div class="lever-track">
@@ -188,7 +188,7 @@
             <div class="settings-overlay"></div>
             <div class="settings-panel">
                 <button id="settings-close" class="rules-close" aria-label="Close player stats">&times;</button>
-                <h2 id="settings-title" class="rules-title">PLAYER</h2>
+                <h2 id="settings-title" class="rules-title">PLAYER STATS</h2>
 
                 <div class="settings-section">
                     <p class="player-section-label">This Run</p>
@@ -214,7 +214,7 @@
                             <span id="player-rec-highest-balance" class="stats-value">$0.00</span>
                         </div>
                         <div class="stats-row">
-                            <span class="stats-label">Best Single Win</span>
+                            <span class="stats-label">Highest Win</span>
                             <span id="player-rec-highest-win" class="stats-value">$0.00</span>
                         </div>
                         <div class="stats-row">
@@ -222,7 +222,7 @@
                             <span id="player-rec-highest-net" class="stats-value">$0.00</span>
                         </div>
                         <div class="stats-row">
-                            <span class="stats-label">Most Loans</span>
+                            <span class="stats-label">Most Loans Taken</span>
                             <span id="player-rec-bailouts" class="stats-value">0</span>
                         </div>
                         <div class="stats-row">
@@ -281,19 +281,19 @@
                 <div class="go-columns">
                     <div class="go-section">
                         <h3>This Run</h3>
-                        <div class="go-row"><span>Spins</span><span id="go-run-spins">0</span></div>
                         <div class="go-row"><span>Peak Balance</span><span id="go-run-peak">$0.00</span></div>
                         <div class="go-row"><span>Best Win</span><span id="go-run-highest-win">$0.00</span></div>
                         <div class="go-row"><span>Net Gain/Loss</span><span id="go-run-net">$0.00</span></div>
                         <div class="go-row"><span>Loans Taken</span><span id="go-run-bailouts">0</span></div>
                         <div class="go-row"><span>Debts Cleared</span><span id="go-run-debt-clears">0</span></div>
+                        <div class="go-row"><span>Spins</span><span id="go-run-spins">0</span></div>
                     </div>
                     <div class="go-section">
                         <h3>All-Time</h3>
                         <div class="go-row"><span>Highest Balance</span><span id="go-rec-highest-balance">$0.00</span></div>
-                        <div class="go-row"><span>Best Win</span><span id="go-rec-highest-win">$0.00</span></div>
+                        <div class="go-row"><span>Highest Win</span><span id="go-rec-highest-win">$0.00</span></div>
                         <div class="go-row"><span>Highest Net Gain</span><span id="go-rec-highest-net">$0.00</span></div>
-                        <div class="go-row"><span>Most Loans</span><span id="go-rec-bailouts">0</span></div>
+                        <div class="go-row"><span>Most Loans Taken</span><span id="go-rec-bailouts">0</span></div>
                         <div class="go-row"><span>Most Debt Clears</span><span id="go-rec-debt-clears">0</span></div>
                         <div class="go-row"><span>Most Spins</span><span id="go-rec-best-run">0</span></div>
                         <div class="go-row"><span>Total Spins</span><span id="go-rec-total-spins">0</span></div>
