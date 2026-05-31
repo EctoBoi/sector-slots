@@ -34,6 +34,8 @@ export class GameOverScreen {
 
         document.getElementById("go-rec-highest-balance")!.textContent = fmt(records.highestBalance);
         document.getElementById("go-rec-highest-win")!.textContent = fmt(records.highestSingleWin);
+        const net = records.highestNetGain;
+        document.getElementById("go-rec-highest-net")!.textContent = (net >= 0 ? "+" : "") + fmt(net);
         document.getElementById("go-rec-bailouts")!.textContent = String(records.mostLoans);
         document.getElementById("go-rec-best-run")!.textContent = String(records.bestRunSpins);
         document.getElementById("go-rec-total-spins")!.textContent = String(records.totalSpins);

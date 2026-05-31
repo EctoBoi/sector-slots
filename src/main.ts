@@ -59,6 +59,7 @@ const gameOverEl = document.getElementById("game-over-screen")!;
 const denomSliderEl = document.getElementById("denom-slider") as HTMLInputElement;
 const playerRecHighestBalanceEl = document.getElementById("player-rec-highest-balance")!;
 const playerRecHighestWinEl = document.getElementById("player-rec-highest-win")!;
+const playerRecHighestNetEl = document.getElementById("player-rec-highest-net")!;
 const playerRecBailoutsEl = document.getElementById("player-rec-bailouts")!;
 const playerRecBestRunEl = document.getElementById("player-rec-best-run")!;
 const playerRecTotalSpinsEl = document.getElementById("player-rec-total-spins")!;
@@ -111,6 +112,7 @@ volumeSlider.addEventListener("input", () => {
 // ─── Start new run ──────────────────────────────────────────────────────────
 newRunBtn.addEventListener("click", () => {
     isGameOver = false;
+    commitRecords();
     state.denomination = CONFIG.denomination;
     denomIndex = Math.max(0, DENOMINATIONS.indexOf(CONFIG.denomination));
     resetRunState();
@@ -138,7 +140,7 @@ forceResetBtn.addEventListener("click", () => {
         forceResetBtn.classList.remove("force-reset-btn--confirm");
 
         isGameOver = false;
-        state.records = { highestBalance: 0, highestSingleWin: 0, mostLoans: 0, bestRunSpins: 0, totalSpins: 0 };
+        state.records = { highestBalance: 0, highestSingleWin: 0, highestNetGain: 0, mostLoans: 0, bestRunSpins: 0, totalSpins: 0 };
         state.denomination = CONFIG.denomination;
         denomIndex = Math.max(0, DENOMINATIONS.indexOf(CONFIG.denomination));
         resetRunState();
@@ -381,6 +383,23 @@ function resetRunState(): void {
     updateUI();
 }
 
+function commitRecords(): void {
+    if (state.highestBalance > state.records.highestBalance) {
+        state.records.highestBalance = state.highestBalance;
+    }
+    const runNet = Math.round((state.totalAmountWon - state.totalAmountLost) * 100) / 100;
+    if (runNet > state.records.highestNetGain) {
+        state.records.highestNetGain = runNet;
+    }
+    if (state.totalSpins > state.records.bestRunSpins) {
+        state.records.bestRunSpins = state.totalSpins;
+    }
+    if (state.loansThisRun > state.records.mostLoans) {
+        state.records.mostLoans = state.loansThisRun;
+    }
+    state.records.totalSpins += state.totalSpins;
+}
+
 function triggerGameOver(reason: GameOverReason): void {
     if (isGameOver) return;
     isGameOver = true;
@@ -392,16 +411,7 @@ function triggerGameOver(reason: GameOverReason): void {
     };
 
     // Update all-time records before resetting run state
-    if (state.highestBalance > state.records.highestBalance) {
-        state.records.highestBalance = state.highestBalance;
-    }
-    if (state.totalSpins > state.records.bestRunSpins) {
-        state.records.bestRunSpins = state.totalSpins;
-    }
-    if (state.loansThisRun > state.records.mostLoans) {
-        state.records.mostLoans = state.loansThisRun;
-    }
-    state.records.totalSpins += state.totalSpins;
+    commitRecords();
 
     resetRunState();
     gameOverScreen.show(summary, state.records, reason);
@@ -418,6 +428,10 @@ function updatePlayerModal(): void {
     playerRecHighestBalanceEl.textContent = `$${rec.highestBalance.toFixed(2)}`;
     playerRecHighestWinEl.textContent = `$${rec.highestSingleWin.toFixed(2)}`;
     // Show the best of the committed record or the current run live
+    const liveNet = Math.round((state.totalAmountWon - state.totalAmountLost) * 100) / 100;
+    const bestNet = Math.max(rec.highestNetGain, liveNet);
+    playerRecHighestNetEl.textContent = (bestNet >= 0 ? "+" : "") + `$${bestNet.toFixed(2)}`;
+    playerRecHighestNetEl.className = "stats-value";
     playerRecBailoutsEl.textContent = String(Math.max(rec.mostLoans, state.loansThisRun));
     playerRecBestRunEl.textContent = String(Math.max(rec.bestRunSpins, state.totalSpins));
     playerRecTotalSpinsEl.textContent = String(rec.totalSpins + state.totalSpins);

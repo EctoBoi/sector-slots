@@ -10,6 +10,7 @@ export interface DebtRecord {
 export interface AllTimeRecords {
     highestBalance: number;
     highestSingleWin: number;
+    highestNetGain: number;
     mostLoans: number;
     bestRunSpins: number;
     totalSpins: number;
@@ -30,19 +31,13 @@ export interface PlayerState {
 }
 
 function defaultRecords(): AllTimeRecords {
-    return { highestBalance: 0, highestSingleWin: 0, mostLoans: 0, bestRunSpins: 0, totalSpins: 0 };
+    return { highestBalance: 0, highestSingleWin: 0, highestNetGain: 0, mostLoans: 0, bestRunSpins: 0, totalSpins: 0 };
 }
 
 function parseDebt(d: unknown): DebtRecord | null {
     if (!d || typeof d !== "object") return null;
     const o = d as Record<string, unknown>;
-    if (
-        typeof o.id !== "number" ||
-        typeof o.originalAmount !== "number" ||
-        typeof o.currentBalance !== "number" ||
-        typeof o.rate !== "number"
-    )
-        return null;
+    if (typeof o.id !== "number" || typeof o.originalAmount !== "number" || typeof o.currentBalance !== "number" || typeof o.rate !== "number") return null;
     return o as unknown as DebtRecord;
 }
 
@@ -52,6 +47,7 @@ function parseRecords(r: unknown): AllTimeRecords {
     return {
         highestBalance: typeof o.highestBalance === "number" ? o.highestBalance : 0,
         highestSingleWin: typeof o.highestSingleWin === "number" ? o.highestSingleWin : 0,
+        highestNetGain: typeof o.highestNetGain === "number" ? o.highestNetGain : 0,
         mostLoans: typeof o.mostLoans === "number" ? o.mostLoans : 0,
         bestRunSpins: typeof o.bestRunSpins === "number" ? o.bestRunSpins : 0,
         totalSpins: typeof o.totalSpins === "number" ? o.totalSpins : 0,
