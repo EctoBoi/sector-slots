@@ -84,31 +84,64 @@ export class WinDisplay {
 
         for (const [r, c] of match.cells) {
             const tileLeft = tilePad + c * (tileSize + tileGap);
-            const tileTop = tilePad + r * (tileSize + tileGap);
-            const cx = tileLeft + tileSize / 2; // x-centre of tile
-            const cy = tileTop + tileSize / 2; // y-centre of tile
+            const tileTop  = tilePad + r * (tileSize + tileGap);
+            const tileRight  = tileLeft + tileSize;
+            const tileBottom = tileTop  + tileSize;
+            const cx = tileLeft + tileSize / 2;
+            const cy = tileTop  + tileSize / 2;
 
-            // Top outer edge → two beams race left & right along the TOP border (y = 0)
+            // ── Grid-border beams (existing) ─────────────────────────────────
+
+            // Top outer edge → beams race left & right along the TOP grid border (y = 0)
             if (!cells.has(`${r - 1},${c}`)) {
-                if (cx > 0) this.createBeam("h", 0, 0, cx, 2, "right center", delayMs, "right");
-                if (cx < gridW) this.createBeam("h", cx, 0, gridW - cx, 2, "left center", delayMs, "left");
+                if (cx > 0)     this.createBeam("h",      0, 0, cx,         2, "right center", delayMs, "right");
+                if (cx < gridW) this.createBeam("h",     cx, 0, gridW - cx, 2, "left center",  delayMs, "left");
             }
-            // Bottom outer edge → two beams along the BOTTOM border (y = gridH - 2)
+            // Bottom outer edge → beams along the BOTTOM grid border
             if (!cells.has(`${r + 1},${c}`)) {
                 const by = gridH - 2;
-                if (cx > 0) this.createBeam("h", 0, by, cx, 2, "right center", delayMs, "right");
-                if (cx < gridW) this.createBeam("h", cx, by, gridW - cx, 2, "left center", delayMs, "left");
+                if (cx > 0)     this.createBeam("h",      0, by, cx,         2, "right center", delayMs, "right");
+                if (cx < gridW) this.createBeam("h",     cx, by, gridW - cx, 2, "left center",  delayMs, "left");
             }
-            // Left outer edge → two beams race up & down along the LEFT border (x = 0)
+            // Left outer edge → beams along the LEFT grid border
             if (!cells.has(`${r},${c - 1}`)) {
-                if (cy > 0) this.createBeam("v", 0, 0, 2, cy, "bottom center", delayMs, "bottom");
-                if (cy < gridH) this.createBeam("v", 0, cy, 2, gridH - cy, "top center", delayMs, "top");
+                if (cy > 0)     this.createBeam("v", 0,    0, 2, cy,         "bottom center", delayMs, "bottom");
+                if (cy < gridH) this.createBeam("v", 0,   cy, 2, gridH - cy, "top center",    delayMs, "top");
             }
-            // Right outer edge → two beams along the RIGHT border (x = gridW - 2)
+            // Right outer edge → beams along the RIGHT grid border
             if (!cells.has(`${r},${c + 1}`)) {
                 const rx = gridW - 2;
-                if (cy > 0) this.createBeam("v", rx, 0, 2, cy, "bottom center", delayMs, "bottom");
-                if (cy < gridH) this.createBeam("v", rx, cy, 2, gridH - cy, "top center", delayMs, "top");
+                if (cy > 0)     this.createBeam("v", rx,   0, 2, cy,         "bottom center", delayMs, "bottom");
+                if (cy < gridH) this.createBeam("v", rx,  cy, 2, gridH - cy, "top center",    delayMs, "top");
+            }
+
+            // ── Enclosure-wall beams (new) ───────────────────────────────────
+            // Each outer perimeter wall of the enclosure fires two beams that
+            // race along that wall's line to the grid edges in both directions.
+
+            // Top wall of tile → beams run left & right at y = tileTop
+            if (!cells.has(`${r - 1},${c}`)) {
+                const wy = tileTop - 1;
+                if (tileLeft > 0)      this.createBeam("h",         0, wy, tileLeft,          2, "right center", delayMs, "right");
+                if (tileRight < gridW) this.createBeam("h", tileRight, wy, gridW - tileRight, 2, "left center",  delayMs, "left");
+            }
+            // Bottom wall → beams left & right at y = tileBottom
+            if (!cells.has(`${r + 1},${c}`)) {
+                const wy = tileBottom - 1;
+                if (tileLeft > 0)      this.createBeam("h",         0, wy, tileLeft,          2, "right center", delayMs, "right");
+                if (tileRight < gridW) this.createBeam("h", tileRight, wy, gridW - tileRight, 2, "left center",  delayMs, "left");
+            }
+            // Left wall → beams up & down at x = tileLeft
+            if (!cells.has(`${r},${c - 1}`)) {
+                const wx = tileLeft - 1;
+                if (tileTop > 0)          this.createBeam("v", wx,          0, 2, tileTop,          "bottom center", delayMs, "bottom");
+                if (tileBottom < gridH)   this.createBeam("v", wx, tileBottom, 2, gridH - tileBottom, "top center",    delayMs, "top");
+            }
+            // Right wall → beams up & down at x = tileRight
+            if (!cells.has(`${r},${c + 1}`)) {
+                const wx = tileRight - 1;
+                if (tileTop > 0)          this.createBeam("v", wx,          0, 2, tileTop,          "bottom center", delayMs, "bottom");
+                if (tileBottom < gridH)   this.createBeam("v", wx, tileBottom, 2, gridH - tileBottom, "top center",    delayMs, "top");
             }
         }
     }
