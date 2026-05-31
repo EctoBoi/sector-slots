@@ -58,6 +58,14 @@ export class DebtPanel {
     render(): void {
         this.listEl.innerHTML = "";
 
+        if (this.state.debtCleared > 0) {
+            const badge = document.createElement("div");
+            badge.className = "debt-cleared-badge";
+            const discountPct = (this.state.debtCleared * 0.5).toFixed(1);
+            badge.textContent = `Debts Cleared: ${this.state.debtCleared} (-${discountPct}% to next Interest)`;
+            this.listEl.appendChild(badge);
+        }
+
         if (this.state.debts.length === 0) {
             const empty = document.createElement("p");
             empty.className = "debt-empty";
@@ -81,7 +89,7 @@ export class DebtPanel {
         this.loanBtn.disabled = !loanOk;
         this.loanBtn.classList.toggle("loan-btn--blocked", !loanOk);
         if (loanOk) {
-            const next = getLoanTier(this.state.nextLoanIndex);
+            const next = getLoanTier(this.state.nextLoanIndex, this.state.debtCleared);
             this.loanBtn.textContent = `Request Loan — $${next.amount} @ ${(next.rate * 100).toFixed(1)}%/spin`;
         } else {
             this.loanBtn.textContent = "Debt Too High To Request Loan";
@@ -128,7 +136,11 @@ export class DebtPanel {
         btn.addEventListener("click", () => {
             const amount = parseFloat(input.value);
             if (isNaN(amount) || amount <= 0) return;
+            const hadDebts = this.state.debts.length > 0;
             repayDebt(this.state, debt.id, amount);
+            if (hadDebts && this.state.debts.length === 0) {
+                this.state.debtCleared++;
+            }
             saveState(this.state);
             this.render();
             this.onStateChange();

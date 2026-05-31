@@ -1,19 +1,22 @@
 import { DEBT_CEILING, LOAN_TIERS } from "../constants/config";
 import type { PlayerState, DebtRecord } from "./PlayerState";
 
-export function getLoanTier(loanNumber: number): { amount: number; rate: number } {
+export function getLoanTier(loanNumber: number, debtCleared = 0): { amount: number; rate: number } {
     const idx = loanNumber - 1;
     const amount = idx < LOAN_TIERS.length ? LOAN_TIERS[idx] : LOAN_TIERS[LOAN_TIERS.length - 1];
-    return { amount, rate: loanNumber * 0.005 };
+    const baseRate = loanNumber * 0.005;
+    const discount = debtCleared * 0.005;
+    const rate = Math.max(0.005, baseRate - discount);
+    return { amount, rate };
 }
 
 export function canTakeLoan(state: PlayerState): boolean {
-    const next = getLoanTier(state.nextLoanIndex);
+    const next = getLoanTier(state.nextLoanIndex, state.debtCleared);
     return getTotalDebt(state) + next.amount <= DEBT_CEILING;
 }
 
 export function takeLoan(state: PlayerState): void {
-    const tier = getLoanTier(state.nextLoanIndex);
+    const tier = getLoanTier(state.nextLoanIndex, state.debtCleared);
     const debt: DebtRecord = {
         id: state.nextLoanIndex,
         originalAmount: tier.amount,

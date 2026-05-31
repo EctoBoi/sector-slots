@@ -62,6 +62,7 @@ const playerRecHighestBalanceEl = document.getElementById("player-rec-highest-ba
 const playerRecHighestWinEl = document.getElementById("player-rec-highest-win")!;
 const playerRecHighestNetEl = document.getElementById("player-rec-highest-net")!;
 const playerRecBailoutsEl = document.getElementById("player-rec-bailouts")!;
+const playerRecDebtClearsEl = document.getElementById("player-rec-debt-clears")!;
 const playerRecBestRunEl = document.getElementById("player-rec-best-run")!;
 const playerRecTotalSpinsEl = document.getElementById("player-rec-total-spins")!;
 const forceResetBtn = document.getElementById("force-reset-btn") as HTMLButtonElement;
@@ -171,7 +172,7 @@ forceResetBtn.addEventListener("click", () => {
         forceResetBtn.classList.remove("force-reset-btn--confirm");
 
         isGameOver = false;
-        state.records = { highestBalance: 0, highestSingleWin: 0, highestNetGain: 0, mostLoans: 0, bestRunSpins: 0, totalSpins: 0 };
+        state.records = { highestBalance: 0, highestSingleWin: 0, highestNetGain: 0, mostLoans: 0, mostDebtClears: 0, bestRunSpins: 0, totalSpins: 0 };
         state.denomination = CONFIG.denomination;
         denomIndex = Math.max(0, DENOMINATIONS.indexOf(CONFIG.denomination));
         resetRunState();
@@ -393,6 +394,7 @@ function resetRunState(): void {
     state.debts = [];
     state.nextLoanIndex = 1;
     state.loansThisRun = 0;
+    state.debtCleared = 0;
     state.highestSingleWin = 0;
 
     saveState(state);
@@ -418,6 +420,9 @@ function commitRecords(): void {
     if (state.loansThisRun > state.records.mostLoans) {
         state.records.mostLoans = state.loansThisRun;
     }
+    if (state.debtCleared > state.records.mostDebtClears) {
+        state.records.mostDebtClears = state.debtCleared;
+    }
     state.records.totalSpins += state.totalSpins;
 }
 
@@ -429,6 +434,7 @@ function triggerGameOver(reason: GameOverReason): void {
         runSpins: state.totalSpins,
         peakBalance: state.highestBalance,
         loansThisRun: state.loansThisRun,
+        debtClearedThisRun: state.debtCleared,
         highestSingleWin: state.highestSingleWin,
         runNet: Math.round((state.totalAmountWon - state.totalAmountLost) * 100) / 100,
     };
@@ -456,6 +462,7 @@ function updatePlayerModal(): void {
     playerRecHighestNetEl.textContent = (bestNet >= 0 ? "+" : "") + `$${bestNet.toFixed(2)}`;
     playerRecHighestNetEl.className = "stats-value";
     playerRecBailoutsEl.textContent = String(Math.max(rec.mostLoans, state.loansThisRun));
+    playerRecDebtClearsEl.textContent = String(Math.max(rec.mostDebtClears, state.debtCleared));
     playerRecBestRunEl.textContent = String(Math.max(rec.bestRunSpins, state.totalSpins));
     playerRecTotalSpinsEl.textContent = String(rec.totalSpins + state.totalSpins);
 }

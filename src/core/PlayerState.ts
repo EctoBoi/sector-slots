@@ -12,6 +12,7 @@ export interface AllTimeRecords {
     highestSingleWin: number;
     highestNetGain: number;
     mostLoans: number;
+    mostDebtClears: number;
     bestRunSpins: number;
     totalSpins: number;
 }
@@ -27,12 +28,13 @@ export interface PlayerState {
     debts: DebtRecord[];
     nextLoanIndex: number;
     loansThisRun: number;
+    debtCleared: number;
     highestSingleWin: number;
     records: AllTimeRecords;
 }
 
 function defaultRecords(): AllTimeRecords {
-    return { highestBalance: 0, highestSingleWin: 0, highestNetGain: 0, mostLoans: 0, bestRunSpins: 0, totalSpins: 0 };
+    return { highestBalance: 0, highestSingleWin: 0, highestNetGain: 0, mostLoans: 0, mostDebtClears: 0, bestRunSpins: 0, totalSpins: 0 };
 }
 
 function parseDebt(d: unknown): DebtRecord | null {
@@ -50,6 +52,7 @@ function parseRecords(r: unknown): AllTimeRecords {
         highestSingleWin: typeof o.highestSingleWin === "number" ? o.highestSingleWin : 0,
         highestNetGain: typeof o.highestNetGain === "number" ? o.highestNetGain : 0,
         mostLoans: typeof o.mostLoans === "number" ? o.mostLoans : 0,
+        mostDebtClears: typeof o.mostDebtClears === "number" ? o.mostDebtClears : 0,
         bestRunSpins: typeof o.bestRunSpins === "number" ? o.bestRunSpins : 0,
         totalSpins: typeof o.totalSpins === "number" ? o.totalSpins : 0,
     };
@@ -72,6 +75,7 @@ export function loadState(startingBalance: number, defaultDenomination: number):
                 debts: rawDebts.map(parseDebt).filter((d): d is DebtRecord => d !== null),
                 nextLoanIndex: typeof parsed.nextLoanIndex === "number" ? parsed.nextLoanIndex : 1,
                 loansThisRun: typeof parsed.loansThisRun === "number" ? parsed.loansThisRun : 0,
+                debtCleared: typeof parsed.debtCleared === "number" ? parsed.debtCleared : 0,
                 highestSingleWin: typeof parsed.highestSingleWin === "number" ? parsed.highestSingleWin : 0,
                 records: parseRecords(parsed.records),
             };
@@ -90,6 +94,7 @@ export function loadState(startingBalance: number, defaultDenomination: number):
         debts: [],
         nextLoanIndex: 1,
         loansThisRun: 0,
+        debtCleared: 0,
         highestSingleWin: 0,
         records: defaultRecords(),
     };

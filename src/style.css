@@ -1292,6 +1292,18 @@ body {
     margin-bottom: 14px;
 }
 
+.debt-cleared-badge {
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.35);
+    border-radius: 8px;
+    color: #4ade80;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 7px 12px;
+    text-align: center;
+}
+
 .debt-empty {
     font-size: 0.8rem;
     opacity: 0.45;

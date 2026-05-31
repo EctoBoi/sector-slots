@@ -6,6 +6,7 @@ export interface RunSummary {
     runSpins: number;
     peakBalance: number;
     loansThisRun: number;
+    debtClearedThisRun: number;
     highestSingleWin: number;
     runNet: number;
 }
@@ -36,11 +37,13 @@ export class GameOverScreen {
         document.getElementById("go-run-highest-win")!.textContent = fmt(summary.highestSingleWin);
         document.getElementById("go-run-net")!.textContent = fmtSigned(summary.runNet);
         document.getElementById("go-run-bailouts")!.textContent = String(summary.loansThisRun);
+        document.getElementById("go-run-debt-clears")!.textContent = String(summary.debtClearedThisRun);
 
         document.getElementById("go-rec-highest-balance")!.textContent = fmt(records.highestBalance);
         document.getElementById("go-rec-highest-win")!.textContent = fmt(records.highestSingleWin);
         document.getElementById("go-rec-highest-net")!.textContent = fmtSigned(records.highestNetGain);
         document.getElementById("go-rec-bailouts")!.textContent = String(records.mostLoans);
+        document.getElementById("go-rec-debt-clears")!.textContent = String(records.mostDebtClears);
         document.getElementById("go-rec-best-run")!.textContent = String(records.bestRunSpins);
         document.getElementById("go-rec-total-spins")!.textContent = String(records.totalSpins);
 
