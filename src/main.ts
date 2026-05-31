@@ -302,7 +302,7 @@ function onLeverPull(): void {
             if (reward.totalPayout > state.highestSingleWin) {
                 state.highestSingleWin = reward.totalPayout;
             }
-            sound.playWinTier(reward.highestTier);
+            sound.playWinSequence(matches);
             gridRenderer.highlightMatches(matches);
             winDisp.show(reward, state.denomination, matches);
         } else {

@@ -3,10 +3,10 @@
     --tile-size: 64px;
     --tile-border-color: #e0c96e;
     --tile-border-color-win: #ffffff;
-    --tile-bg: #1a1a2e;
-    --tile-bg-win: #2a2a0e;
-    --glow-color: rgba(224, 201, 110, 0.6);
-    --bg: #0d0d1a;
+    --tile-bg: #22223c;
+    --tile-bg-win: #34340e;
+    --glow-color: rgba(224, 201, 110, 0.7);
+    --bg: #14142b;
     --accent: #e0c96e;
     --text: #f0e8cc;
     --hud-bg: rgba(255, 255, 255, 0.05);
@@ -212,7 +212,7 @@ body {
 
 .rules-panel {
     position: relative;
-    background: linear-gradient(160deg, #1a1a30 0%, #0d0d1a 100%);
+    background: linear-gradient(160deg, #22223c 0%, #14142b 100%);
     border: 2px solid var(--accent);
     border-radius: 12px;
     padding: 28px 28px 24px;
@@ -221,9 +221,9 @@ body {
     max-height: 85vh;
     overflow-y: auto;
     box-shadow:
-        0 0 0 4px #0d0d1a,
+        0 0 0 4px #14142b,
         0 0 0 6px rgba(224, 201, 110, 0.4),
-        0 24px 64px rgba(0, 0, 0, 0.8);
+        0 24px 64px rgba(0, 0, 0, 0.7);
     animation: fadeIn 0.2s ease;
 }
 
@@ -434,16 +434,16 @@ body {
 
 .settings-panel {
     position: relative;
-    background: linear-gradient(160deg, #1a1a30 0%, #0d0d1a 100%);
+    background: linear-gradient(160deg, #22223c 0%, #14142b 100%);
     border: 2px solid var(--accent);
     border-radius: 12px;
     padding: 28px 28px 24px;
     max-width: 400px;
     width: 100%;
     box-shadow:
-        0 0 0 4px #0d0d1a,
+        0 0 0 4px #14142b,
         0 0 0 6px rgba(224, 201, 110, 0.4),
-        0 24px 64px rgba(0, 0, 0, 0.8);
+        0 24px 64px rgba(0, 0, 0, 0.7);
     animation: fadeIn 0.2s ease;
 }
 
@@ -601,6 +601,7 @@ body {
 
 .hud-history {
     align-items: flex-start;
+    gap: 4px;
 }
 
 .denom-stepper {
@@ -650,17 +651,17 @@ body {
     display: flex;
     flex-direction: column;
     padding: 24px;
-    background: linear-gradient(160deg, #181830 0%, #0d0d1a 100%);
+    background: linear-gradient(160deg, #20203e 0%, #14142b 100%);
     border: 2px solid var(--accent);
     border-radius: 14px;
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.05),
-        0 0 0 4px #0d0d1a,
-        0 0 0 6px rgba(224, 201, 110, 0.55),
-        0 0 0 10px #0d0d1a,
-        0 0 0 12px rgba(224, 201, 110, 0.2),
-        0 0 50px rgba(224, 201, 110, 0.18),
-        0 16px 48px rgba(0, 0, 0, 0.8);
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 0 0 4px #14142b,
+        0 0 0 6px rgba(224, 201, 110, 0.6),
+        0 0 0 10px #14142b,
+        0 0 0 12px rgba(224, 201, 110, 0.25),
+        0 0 60px rgba(224, 201, 110, 0.22),
+        0 16px 48px rgba(0, 0, 0, 0.7);
 }
 
 /* Inner corner L-bracket ornaments */
@@ -708,7 +709,7 @@ body {
     padding: 0 10px;
     font-size: 1.1rem;
     line-height: 1;
-    text-shadow: 0 0 14px var(--glow-color);
+    text-shadow: 0 0 18px var(--glow-color);
     z-index: 2;
 }
 
