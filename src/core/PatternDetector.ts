@@ -1,6 +1,6 @@
 ﻿import type { GridData } from "./Grid";
-import { ENCLOSURE_TIERS } from "../constants/patterns";
-import type { PayoutTier } from "../constants/patterns";
+import { ENCLOSURE_TIERS } from "../constants/payouts";
+import type { PayoutTier } from "../constants/payouts";
 import { SYMBOLS, Side } from "../constants/symbols";
 
 export interface PatternMatch {

@@ -1,6 +1,6 @@
 import { DEFAULT_DENOMINATION, DENOMINATIONS, PAYOUT_MULTIPLIERS } from "./payouts";
 import { DEFAULT_SYMBOL_WEIGHTS } from "./symbols";
-import type { PayoutTier } from "./patterns";
+import type { PayoutTier } from "./payouts";
 
 export const DEBT_CEILING = 3000;
 
