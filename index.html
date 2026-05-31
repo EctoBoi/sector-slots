@@ -65,6 +65,10 @@
 
             <!-- Main game area -->
             <div class="machine-frame">
+                <div class="machine-win-header">
+                    <div id="machine-win-tier" class="machine-win-tier" data-tier="no_win">NO WIN</div>
+                    <div id="machine-win-payout" class="machine-win-payout"></div>
+                </div>
                 <div class="game-area">
                     <!-- Grid -->
                     <div id="grid-container" class="grid-container"></div>
@@ -109,11 +113,6 @@
                     <p class="couch-label">Searching cushions…</p>
                 </div>
                 <p id="couch-found" class="couch-found hidden"></p>
-            </div>
-
-            <!-- Win display overlay -->
-            <div id="win-display" class="win-display hidden">
-                <div id="win-text" class="win-text"></div>
             </div>
         </div>
 

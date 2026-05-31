@@ -29,8 +29,8 @@ const balanceEl = document.getElementById("balance-value")!;
 const lastWinEl = document.getElementById("last-win-value")!;
 const spinsEl = document.getElementById("spins-value")!;
 const highestBalanceEl = document.getElementById("highest-balance-value")!;
-const winContainerEl = document.getElementById("win-display")!;
-const winTextEl = document.getElementById("win-text")!;
+const machineWinTierEl = document.getElementById("machine-win-tier")!;
+const machineWinPayoutEl = document.getElementById("machine-win-payout")!;
 const couchBtnEl = document.getElementById("couch-btn")!;
 const knockBtnEl = document.getElementById("knock-btn") as HTMLButtonElement;
 const couchProgressEl = document.getElementById("couch-progress")!;
@@ -200,7 +200,7 @@ if (savedVolume !== null) sound.setVolume(parseFloat(savedVolume));
 if (savedSoundEnabled !== null) sound.setEnabled(savedSoundEnabled !== "false");
 const gridRenderer = new GridRenderer(gridContainer);
 const balanceDisp = new BalanceDisplay(balanceEl, lastWinEl, spinsEl, highestBalanceEl);
-const winDisp = new WinDisplay(winContainerEl, winTextEl);
+const winDisp = new WinDisplay(machineWinTierEl, machineWinPayoutEl, gridContainer);
 // couch and debtPanel reference each other via closures — both safe since
 // closures are called only after construction completes.
 const couch = new CouchCushion(
@@ -270,6 +270,7 @@ function onLeverPull(): void {
 
     brokeMsg.classList.add("hidden");
     gridRenderer.clearHighlights();
+    winDisp.reset();
 
     state.balance = Math.round((state.balance - cost) * 100) / 100;
     state.totalSpins += 1;
@@ -303,7 +304,7 @@ function onLeverPull(): void {
             }
             sound.playWinTier(reward.highestTier);
             gridRenderer.highlightMatches(matches);
-            winDisp.show(reward, state.denomination);
+            winDisp.show(reward, state.denomination, matches);
         } else {
             winDisp.hide();
         }

@@ -12,6 +12,18 @@
     --hud-bg: rgba(255, 255, 255, 0.05);
 }
 
+/* ─── Shared Animations ─────────────────────────────────────────────────── */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* ─── Reset ─────────────────────────────────────────────────────────────── */
 *,
 *::before,
@@ -635,6 +647,8 @@ body {
 /* ─── Machine Frame ─────────────────────────────────────────────────────── */
 .machine-frame {
     position: relative;
+    display: flex;
+    flex-direction: column;
     padding: 24px;
     background: linear-gradient(160deg, #181830 0%, #0d0d1a 100%);
     border: 2px solid var(--accent);
@@ -707,6 +721,7 @@ body {
 
 /* ─── Grid ───────────────────────────────────────────────────────────────── */
 .grid-container {
+    position: relative;
     display: grid;
     grid-template-columns: repeat(5, var(--tile-size));
     grid-template-rows: repeat(5, var(--tile-size));
@@ -874,47 +889,210 @@ body {
     pointer-events: none;
 }
 
-/* ─── Win Display ────────────────────────────────────────────────────────── */
-.win-display {
-    width: 100%;
-    background: rgba(224, 201, 110, 0.08);
-    border: 1px solid var(--accent);
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin-top: -20px;
+/* ─── Machine Win Header ────────────────────────────────────────────────── */
+.machine-win-header {
     text-align: center;
-    animation: fadeIn 0.3s ease;
+    padding: 8px 16px 4px;
+    border-radius: 6px 6px 0 0;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(224, 201, 110, 0.18);
+    margin-bottom: 8px;
 }
 
-.win-tier {
-    font-size: 1.1rem;
+.machine-win-tier {
+    font-size: 1rem;
     font-weight: bold;
-    color: var(--accent);
-    letter-spacing: 0.1em;
-    text-shadow: 0 0 12px var(--glow-color);
+    letter-spacing: 0.18em;
+    color: rgba(224, 201, 110, 0.28);
+    text-shadow: none;
+    transition:
+        color 0.3s ease,
+        text-shadow 0.3s ease;
 }
 
-.win-total {
-    font-size: 1.8rem;
+.machine-win-tier[data-active="true"] {
+    color: var(--accent);
+    text-shadow:
+        0 0 12px var(--glow-color),
+        0 0 24px var(--glow-color);
+}
+
+.machine-win-tier[data-active="true"][data-tier="jackpot"] {
+    color: #ffd700;
+    text-shadow:
+        0 0 14px #ffd700,
+        0 0 28px rgba(255, 215, 0, 0.55);
+}
+
+.machine-win-tier[data-active="true"][data-tier="mega_jackpot"] {
+    color: #ffe566;
+    text-shadow:
+        0 0 18px #ffe566,
+        0 0 40px rgba(255, 229, 102, 0.7);
+    animation: headerPulse 0.9s ease-in-out infinite alternate;
+}
+
+.machine-win-payout {
+    font-size: 1.5rem;
     font-weight: bold;
     color: #fff;
-    margin: 4px 0;
+    min-height: 1.8rem;
+    line-height: 1.8rem;
 }
 
-.win-breakdown {
-    font-size: 0.75rem;
-    opacity: 0.7;
-    line-height: 1.6;
-}
-
-@keyframes fadeIn {
+@keyframes headerPulse {
     from {
-        opacity: 0;
-        transform: translateY(-8px);
+        text-shadow:
+            0 0 18px #ffe566,
+            0 0 36px rgba(255, 229, 102, 0.7);
     }
     to {
+        text-shadow:
+            0 0 32px #ffe566,
+            0 0 64px rgba(255, 229, 102, 0.9);
+    }
+}
+
+/* ─── Floating Win Labels ────────────────────────────────────────────────── */
+.win-label {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    background: rgba(13, 13, 26, 0.7);
+    border: 1.5px solid var(--accent);
+    border-radius: 8px;
+    padding: 5px 10px;
+    text-align: center;
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0;
+    animation:
+        winLabelPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+        colorFlash 0.18s linear 0.45s 8 alternate;
+}
+
+.win-label[data-tier="jackpot"] {
+    border-color: #ffd700;
+}
+.win-label[data-tier="mega_jackpot"] {
+    border-color: #ffe566;
+}
+
+.win-label__multiplier {
+    font-size: 0.82rem;
+    font-weight: bold;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+}
+
+.win-label[data-tier="jackpot"] .win-label__multiplier {
+    color: #ffd700;
+}
+.win-label[data-tier="mega_jackpot"] .win-label__multiplier {
+    color: #ffe566;
+}
+
+.win-label__payout {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #fff;
+    white-space: nowrap;
+}
+
+@keyframes winLabelPop {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+    65% {
+        transform: translate(-50%, -50%) scale(1.28);
         opacity: 1;
-        transform: translateY(0);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes colorFlash {
+    from {
+        border-color: var(--accent);
+        box-shadow: 0 0 8px var(--glow-color);
+    }
+    to {
+        border-color: #fff;
+        box-shadow: 0 0 14px rgba(255, 255, 255, 0.75);
+    }
+}
+
+/* ─── Win Beams ──────────────────────────────────────────────────────────── */
+.win-beam {
+    position: absolute;
+    pointer-events: none;
+    z-index: 9;
+    opacity: 0;
+    animation: beamShoot 0.5s ease-out forwards;
+}
+
+@keyframes beamShoot {
+    0% {
+        opacity: 0;
+        transform: scaleX(0) scaleY(0);
+    }
+    15% {
+        opacity: 1;
+    }
+    60% {
+        opacity: 0.85;
+        transform: scaleX(1) scaleY(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scaleX(1) scaleY(1);
+    }
+}
+
+.win-beam--h {
+    transform-origin: left center;
+    animation-name: beamShootH;
+}
+.win-beam--v {
+    transform-origin: top center;
+    animation-name: beamShootV;
+}
+
+@keyframes beamShootH {
+    0% {
+        opacity: 0;
+        transform: scaleX(0);
+    }
+    15% {
+        opacity: 1;
+    }
+    60% {
+        opacity: 0.85;
+        transform: scaleX(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scaleX(1);
+    }
+}
+
+@keyframes beamShootV {
+    0% {
+        opacity: 0;
+        transform: scaleY(0);
+    }
+    15% {
+        opacity: 1;
+    }
+    60% {
+        opacity: 0.85;
+        transform: scaleY(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scaleY(1);
     }
 }
 
@@ -1216,7 +1394,6 @@ body {
     padding: 6px 8px;
     outline: none;
     min-width: 0;
-    -webkit-appearance: none;
 }
 
 .debt-repay-input:focus {
@@ -1495,16 +1672,6 @@ body {
     opacity: 0.85;
 }
 
-@media (max-width: 420px) {
-    .go-columns {
-        grid-template-columns: 1fr;
-    }
-
-    .go-title {
-        font-size: 1.8rem;
-    }
-}
-
 /* ─── Player modal extras ────────────────────────────────────────────────── */
 .settings-panel {
     max-height: 85vh;
@@ -1545,6 +1712,10 @@ body {
 
     .machine-frame {
         padding: 20px;
+    }
+
+    .machine-win-payout {
+        font-size: 1.3rem;
     }
 
     .game-header h1 {
@@ -1635,5 +1806,15 @@ body {
 
     .hud-spins {
         font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 420px) {
+    .go-columns {
+        grid-template-columns: 1fr;
+    }
+
+    .go-title {
+        font-size: 1.8rem;
     }
 }
