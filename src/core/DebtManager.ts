@@ -5,7 +5,7 @@ export function getLoanTier(loanNumber: number, debtCleared = 0): { amount: numb
     const idx = loanNumber - 1;
     const amount = idx < LOAN_TIERS.length ? LOAN_TIERS[idx] : LOAN_TIERS[LOAN_TIERS.length - 1];
     const baseRate = loanNumber * 0.005;
-    const discount = debtCleared * 0.005;
+    const discount = debtCleared * 0.004;
     const rate = Math.max(0.005, baseRate - discount);
     return { amount, rate };
 }

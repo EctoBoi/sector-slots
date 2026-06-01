@@ -61,7 +61,7 @@ export class DebtPanel {
         if (this.state.debtCleared > 0) {
             const badge = document.createElement("div");
             badge.className = "debt-cleared-badge";
-            const discountPct = (this.state.debtCleared * 0.5).toFixed(1);
+            const discountPct = (this.state.debtCleared * 0.4).toFixed(1);
             badge.textContent = `Debts Cleared: ${this.state.debtCleared} (-${discountPct}% to next Interest)`;
             this.listEl.appendChild(badge);
         }
